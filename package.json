@@ -2,6 +2,7 @@
   "name": "2018_09_23_zatanna",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://vutsalsinghal.github.io/Zatanna/",
   "dependencies": {
     "@linniaprotocol/linnia-js": "^0.2.0",
     "eth-crypto": "^1.2.4",
@@ -22,6 +23,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }
