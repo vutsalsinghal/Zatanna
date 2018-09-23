@@ -1,2 +1,3 @@
-# Zatana
+# Zatanna
+
 Decentralized Music Service
