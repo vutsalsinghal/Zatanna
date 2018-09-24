@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Button, Icon, Modal, Card, Grid, Loader, Dimmer} from 'semantic-ui-react';
+import {Grid, Loader, Dimmer} from 'semantic-ui-react';
 
 class Home extends Component {
   state = {

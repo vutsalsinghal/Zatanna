@@ -9,8 +9,8 @@ class App extends Component {
       <BrowserRouter>
         <Layout>
           <Switch>
-            <Route exact path="/" component={Home} />
-            {/*<Route path="/eventDetail" component={} />*/}
+            <Route exact path="/Zatanna" component={Home} />
+            {/*<Route path="/Zatanna/someLinks" component={} />*/}
           </Switch>
         </Layout>
       </BrowserRouter>
