@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {Grid, Loader, Dimmer} from 'semantic-ui-react';
+import web3 from '../ethereum/web3';
 
 class Home extends Component {
   state = {
