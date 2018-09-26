@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Modal, Icon } from 'semantic-ui-react';
+import { Menu, Icon } from 'semantic-ui-react';
 import {Link} from 'react-router-dom';
 
 export default () => {

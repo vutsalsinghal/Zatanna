@@ -1,7 +1,6 @@
 import Web3 from 'web3';
 
 let web3;
-
 function networkCheck(){
   web3.eth.net.getNetworkType((err, netId) => {
     switch (netId) {
@@ -20,8 +19,8 @@ function networkCheck(){
       default:
         alert('This is an unknown network. Please connect to Ropsten Test Network!');
     }
-    })
-  }
+  })
+}
 
 
 if (typeof window !== 'undefined' && typeof window.web3 !== 'undefined') {
@@ -29,6 +28,7 @@ if (typeof window !== 'undefined' && typeof window.web3 !== 'undefined') {
   web3 = new Web3(window.web3.currentProvider);
 }else{
   // We are on the server *OR* the user is not running metamask
+  alert("Please Install MetaMask from metamask.io");
   const provider = new Web3.providers.HttpProvider('https://ropsten.infura.io/fmYYH0aPRKNF5MFSuVNH');
   web3 = new Web3(provider);
 }

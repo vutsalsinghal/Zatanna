@@ -1,5 +1,7 @@
 pragma solidity ^0.4.24;
 
+// Deployed at 0x5483551ec25247d607e113191e02a4507a419fd3 on Ropsten
+
 contract Zatanna{
  uint public lastSong;
  uint public lastUser;
@@ -30,7 +32,7 @@ contract Zatanna{
  
  enum ROLE {UNREGISTERED, ARTIST, USER}                                         // Keep track of type of user
  
- mapping (uint => Artist) public idToArtist;
+ mapping (uint => Artist) idToArtist;
  mapping (address => uint) artistId;
  mapping (address => User) userId;
  mapping (uint => Song) idToSong;
