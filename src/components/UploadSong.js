@@ -8,9 +8,6 @@ import SparkMD5 from 'spark-md5';
 //import AWS from 'aws-sdk';
 
 var Buffer = require('buffer/').Buffer
-//AWS.config.update({accessKeyId: 'AKIAI2RTDMUJXXMBUAIA',secretAccessKey: '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'});
-//const s3 = new AWS.S3();
-
 class UploadSong extends Component {
   state = {
     name:'',
