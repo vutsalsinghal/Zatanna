@@ -10,3 +10,6 @@ yarn-error.log*
 
 node_modules/*
 build/*
+*.csv
+src/config.js
+*.fuse*

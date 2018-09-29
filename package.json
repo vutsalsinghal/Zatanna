@@ -5,8 +5,8 @@
   "homepage": "https://vutsalsinghal.github.io/Zatanna/",
   "dependencies": {
     "@linniaprotocol/linnia-js": "^0.2.0",
-    "eth-crypto": "^1.2.4",
-    "eth-lib": "^0.2.8",
+    "aws-s3": "^1.5.5",
+    "aws-sdk": "^2.325.0",
     "fs-extra": "^7.0.0",
     "gh-pages": "^2.0.0",
     "ipfs-mini": "^1.1.2",
@@ -17,7 +17,8 @@
     "react-scripts": "1.1.5",
     "semantic-ui-css": "^2.4.0",
     "semantic-ui-react": "^0.82.5",
-    "truffle-hdwallet-provider": "0.0.6",
+    "solc": "^0.4.25",
+    "spark-md5": "^3.0.0",
     "web3": "^1.0.0-beta.31"
   },
   "scripts": {
@@ -27,5 +28,8 @@
     "deploy": "gh-pages -d build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "uglify-js": "^2.8.29"
   }
 }
