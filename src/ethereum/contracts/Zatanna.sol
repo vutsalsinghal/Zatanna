@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-// Deployed at 0x5483551ec25247d607e113191e02a4507a419fd3 on Ropsten
+// Deployed at 0x90259d1deaeea7ebc8f047f950418db099cba0a0 on Ropsten
 
 contract Zatanna{
  uint public lastSong;
@@ -47,7 +47,11 @@ contract Zatanna{
  
  // Returns user type
  function getRole() view external returns(ROLE){
-     return role[msg.sender];
+    return role[msg.sender];
+ }
+
+ function songIsUnique(string _hash) view external returns(bool){
+    return (hashToSong[_hash].id == 0);
  }
  
  function userRegister() external{
@@ -62,7 +66,6 @@ contract Zatanna{
  
  function artistRegister(string _name) external{
     require(artistId[msg.sender] == 0, 'Already registered!');
-    
     lastArtist += 1;
     
     Artist memory newArtist = Artist(_name, msg.sender, lastArtist, new uint[](0));
@@ -86,7 +89,6 @@ contract Zatanna{
 
     // Map SongID to Song
     idToSong[lastSong] = Song(artistInstance.id, _cost, lastSong, _duration, now, _name, _genre, _s3link);
-    
     hashToSong[songHash] = idToSong[lastSong];                                  // Update hashToSong dictionary
  }
  
