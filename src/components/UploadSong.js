@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Loader, Dimmer, Message, Form, Input, Button} from 'semantic-ui-react';
-import config from '../config';
+import configuration from '../config';
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 import S3Client from 'aws-s3';
@@ -41,42 +41,46 @@ class UploadSong extends Component {
   }
 
   fileCapture = (file) => {
-    //console.log(file);
     this.setState({errorMessage:'', loading:true, msg:''});
     
-    if (file.type.split('/')[0] === 'audio'){
-      try{
-        let reader = new window.FileReader()
-        reader.readAsArrayBuffer(file)
-        reader.onloadend = async () => {
-          const buffer = Buffer.from(reader.result);
-          var spark = new SparkMD5.ArrayBuffer();
-          spark.append(buffer);
-          let hash = spark.end();
-          this.setState({songHash:hash.toString()});
-        }
-
-        const tmr = setInterval(() => {
-          if (this.state.songHash === '') {
-            // pass
-          }else{
-            clearInterval(tmr);
-            this.checkUnique(file);
+    if (typeof file !== 'undefined'){
+      if (file.type.split('/')[0] === 'audio'){
+        try{
+          let reader = new window.FileReader()
+          reader.readAsArrayBuffer(file)
+          reader.onloadend = async () => {
+            const buffer = Buffer.from(reader.result);
+            var spark = new SparkMD5.ArrayBuffer();
+            spark.append(buffer);
+            let hash = spark.end();
+            this.setState({songHash:hash.toString()});
           }
-        }, 1000);
 
-      }catch(err){
-        console.log("error: ",err.message);
+          const tmr = setInterval(() => {
+            if (this.state.songHash === '') {
+              // pass
+            }else{
+              clearInterval(tmr);
+              this.checkUnique(file);
+            }
+          }, 1000);
+
+        }catch(err){
+          console.log("error: ",err.message);
+        }
+      }else{
+        this.setState({errorMessage:'Not a audio file!'});
+        this.setState({loading:false});
       }
     }else{
-      this.setState({errorMessage:'Not a audio file!'});
+      this.setState({errorMessage:'No file selected!'});
       this.setState({loading:false});
     }
   }
 
   checkUnique = async (file) => {
     const isUnique = await ZatannaInstance.methods.songIsUnique(this.state.songHash).call({from: this.state.userAccount});
-    if (parseInt(isUnique) === 0){
+    if (parseInt(isUnique,10) === 0){
       this.setState({actualSong:file});
     }else{
       this.setState({errorMessage:"The song that you're uploading is not unique. Piracy is a punishable offence!"})
@@ -94,8 +98,8 @@ class UploadSong extends Component {
         const config = {
           bucketName: 'zatanna-music-upload',
           region: 'us-east-1',
-          accessKeyId: config.accessKeyId,
-          secretAccessKey: config.secretAccessKey,
+          accessKeyId: configuration.accessKeyId,
+          secretAccessKey: configuration.secretAccessKey,
           dirName: 'songs', // optional
         }
 
