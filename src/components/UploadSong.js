@@ -40,7 +40,7 @@ class UploadSong extends Component {
     this.setState({loadingData:false});
   }
 
-  fileCapture = async (file) => {
+  fileCapture = (file) => {
     //console.log(file);
     this.setState({errorMessage:'', loading:true, msg:''});
     
@@ -52,21 +52,34 @@ class UploadSong extends Component {
           const buffer = Buffer.from(reader.result);
           var spark = new SparkMD5.ArrayBuffer();
           spark.append(buffer);
-          this.setState({songHash:spark.end().toString()});
+          let hash = spark.end();
+          this.setState({songHash:hash.toString()});
         }
 
-        const isUnique = await ZatannaInstance.methods.songIsUnique(this.state.songHash).call({from: this.state.userAccount});
-        if (parseInt(isUnique) === 0){
-          this.setState({actualSong:file});
-        }else{
-          this.setState({errorMessage:"The song that you're uploading is not unique. Piracy is a punishable offence!"})
-        }
+        const tmr = setInterval(() => {
+          if (this.state.songHash === '') {
+            // pass
+          }else{
+            clearInterval(tmr);
+            this.checkUnique(file);
+          }
+        }, 1000);
 
       }catch(err){
         console.log("error: ",err.message);
       }
     }else{
       this.setState({errorMessage:'Not a audio file!'});
+      this.setState({loading:false});
+    }
+  }
+
+  checkUnique = async (file) => {
+    const isUnique = await ZatannaInstance.methods.songIsUnique(this.state.songHash).call({from: this.state.userAccount});
+    if (parseInt(isUnique) === 0){
+      this.setState({actualSong:file});
+    }else{
+      this.setState({errorMessage:"The song that you're uploading is not unique. Piracy is a punishable offence!"})
     }
 
     this.setState({loading:false});
