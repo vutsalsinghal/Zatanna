@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Grid, Loader, Dimmer, Button, Modal, Icon} from 'semantic-ui-react';
+import {Grid, Loader, Dimmer, Button, Modal, Icon, Card} from 'semantic-ui-react';
 import {Link} from 'react-router-dom';
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
@@ -8,84 +8,104 @@ import RegisterArtist from './RegisterArtist';
 
 class Home extends Component {
   state = {
-    loadingData:false,
-    role:'',
+	loadingData:false,
+	role:'',
   }
 
   async componentDidMount(){
-    this.setState({loadingData:true});
-    document.title = "Zatanna";
+	this.setState({loadingData:true});
+	document.title = "Zatanna";
 
-    try{
-      const accounts = await web3.eth.getAccounts();
-      const role = await ZatannaInstance.methods.getRole().call({from:accounts[0]});
-      this.setState({role});
-    }catch(err){
-      console.log(err);
-    }
+	try{
+	  const accounts = await web3.eth.getAccounts();
+	  const role = await ZatannaInstance.methods.getRole().call({from:accounts[0]});
+	  this.setState({role});
+	}catch(err){
+	  console.log(err);
+	}
 
-    this.setState({loadingData:false});
+	this.setState({loadingData:false});
   }
 
 
 
   render() {
-    if(this.state.loadingData){
-      return (
-          <Dimmer active inverted>
-            <Loader size='massive'>Loading...</Loader>
-          </Dimmer>
-      );
-    }
+	if(this.state.loadingData){
+	  return (
+		  <Dimmer active inverted>
+			<Loader size='massive'>Loading...</Loader>
+		  </Dimmer>
+	  );
+	}
 
-    return (
-      <div>
-        <h1></h1>
-        <Grid stackable>
-          {this.state.role==='0' &&
-            <div>
-              <Grid.Row>
-                <Grid.Column>
-                  <Modal size='small'
-                    trigger={
-                      <Button icon labelPosition='left' className="primary" floated="right">
-                        <Icon name='users' />
-                        User Registration
-                      </Button>
-                    }>
-                    <Modal.Header>Register as a User to Discover Music</Modal.Header>
-                    <Modal.Content>
-                      <RegisterUser />
-                    </Modal.Content>
-                  </Modal>
-                </Grid.Column>
-                <Grid.Column>
-                  <Modal size='small'
-                    trigger={
-                      <Button icon labelPosition='left' className="primary" floated="right">
-                        <Icon name='user' />
-                        Artist Registration
-                      </Button>
-                    }>
-                    <Modal.Header>Register as an Artist</Modal.Header>
-                    <Modal.Content>
-                      <RegisterArtist />
-                    </Modal.Content>
-                  </Modal>
-                </Grid.Column>
-              </Grid.Row>
-            </div>
-          }
+	return (
+	  <div>
+			<h1></h1>
+			{this.state.role==='0' &&
+				<Grid stackable centered>
+				  <Card fluid color='green'>
+				  	<Card.Content>
+				  		<br /><br />
+              <Card.Header><h1>Hi There!</h1></Card.Header>
+              <br /><br />
+              <h3>Register as </h3>
+              <br />
+              <Card.Description>
+					  		<Button.Group>
+								  <Modal size='small'
+										trigger={
+									  <Button icon labelPosition='left' className="primary" floated="right">
+											<Icon name='users' />
+											User
+									  </Button>
+										}>
+										<Modal.Header>Register as a User to Discover Music</Modal.Header>
+										<Modal.Content>
+										  <RegisterUser />
+										</Modal.Content>
+								  </Modal>
 
-          {this.state.role==='1' &&
-            <Button basic icon labelPosition='left' className="primary" floated="right">
-              <Icon name='upload' />
-              <Link to='/Zatanna/uploadSong'>Upload Song</Link>
-            </Button>
-          }
-        </Grid>
-      </div>
-    );
+								  <Button.Or />
+								  
+								  <Modal size='small'
+										trigger={
+										  <Button icon labelPosition='left' className="primary" floated="right">
+											<Icon name='user' />
+											Artist
+										  </Button>
+										}>
+										<Modal.Header>Register as an Artist</Modal.Header>
+										<Modal.Content>
+										  <RegisterArtist />
+										</Modal.Content>
+								  </Modal>
+								</Button.Group>
+								<br /><br />
+							</Card.Description>
+						</Card.Content>
+					</Card>
+				</Grid>
+			}
+
+			{this.state.role==='1' &&
+				<Grid stackable centered>
+				  <Card fluid color='green'>
+				  	<Card.Content>
+				  		<br /><br />
+              <Card.Header><h1>Hey There Artist!</h1></Card.Header>
+              <br /><br />
+              <h3>Welcome Back</h3>
+              <br />
+							<Button basic icon labelPosition='left' className="primary">
+							  <Icon name='upload' />
+							  <Link to='/Zatanna/uploadSong'>Upload Song</Link>
+							</Button>
+						</Card.Content>
+					</Card>
+				</Grid>
+			}
+	  </div>
+	);
   }
 }
 
