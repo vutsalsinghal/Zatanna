@@ -5,7 +5,6 @@ import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 import S3Client from 'aws-s3';
 import SparkMD5 from 'spark-md5';
-//import AWS from 'aws-sdk';
 
 var Buffer = require('buffer/').Buffer
 class UploadSong extends Component {
@@ -83,7 +82,7 @@ class UploadSong extends Component {
     if (parseInt(isUnique,10) === 0){
       this.setState({actualSong:file});
     }else{
-      this.setState({errorMessage:"The song that you're uploading is not unique. Piracy is a punishable offence!"})
+      this.setState({errorMessage:"The song that you're uploading has already been uploaded. Piracy is a punishable offence!"})
     }
 
     this.setState({loading:false});
@@ -126,9 +125,9 @@ class UploadSong extends Component {
   render() {
     if(this.state.loadingData){
       return (
-          <Dimmer active inverted>
-            <Loader size='massive'>Loading...</Loader>
-          </Dimmer>
+        <Dimmer active inverted>
+          <Loader size='massive'>Loading...</Loader>
+        </Dimmer>
       );
     }
 
