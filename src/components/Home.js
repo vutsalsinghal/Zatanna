@@ -116,7 +116,7 @@ class Home extends Component {
                 <br /><br />
                 <h3>Welcome Back</h3>
                 <br />
-                <Link to='/Zatanna'>
+                <Link to='/Zatanna/songs'>
                   <Button basic icon labelPosition='right' className="primary">
                     <Icon name='play circle outline' />
                     Discover Songs

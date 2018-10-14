@@ -54,14 +54,16 @@ class RegisterArtist extends Component {
 
     return (
       <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
-        <Form.Field>
-          <label>Enter Your Name</label>
-          <Input value={this.state.value} onChange={event => this.setState({artistName:event.target.value})} />
-        </Form.Field>
+        <Form.Group>
+          <Form.Field width={12}>
+            <label>Enter Your Name</label>
+            <Input value={this.state.value} onChange={event => this.setState({artistName:event.target.value})} />
+          </Form.Field>
+          <Button size='small' floated='right' primary basic loading={this.state.loading}>
+            Register
+          </Button>
+        </Form.Group>
         <Message error header="Oops!" content={this.state.errorMessage} />
-        <Button primary basic loading={this.state.loading}>
-          Register
-        </Button>
         {statusMessage}
       </Form>
     );

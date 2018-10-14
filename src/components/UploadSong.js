@@ -40,7 +40,7 @@ class UploadSong extends Component {
   }
 
   fileCapture = (file) => {
-    this.setState({errorMessage:'', loading:true, msg:''});
+    this.setState({errorMessage:'', loading:true, msg:'', name:file.name.split('.')[0]});
     
     if (typeof file !== 'undefined'){
       if (file.type.split('/')[0] === 'audio'){
@@ -109,7 +109,7 @@ class UploadSong extends Component {
       }
 
       try{
-        await ZatannaInstance.methods.artistUploadSong(this.state.cost, this.state.duration, this.state.name, this.state.genre, "s3link1", this.state.songHash).send({from:this.state.userAccount});
+        await ZatannaInstance.methods.artistUploadSong(web3.utils.toWei(this.state.cost,'ether'), this.state.duration, this.state.name, this.state.genre, "s3link1", this.state.songHash).send({from:this.state.userAccount});
         this.setState({msg:"Song Uploaded Successfully!"});
       }catch(err){
         //await S3Client.deleteFile(this.state.actualSong.name, config);
@@ -146,13 +146,9 @@ class UploadSong extends Component {
             <h2>Upload Your Creation!</h2>
             <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
               <Form.Field>
-                <label>Song Name</label>
-                <Input onChange={event => this.setState({name:event.target.value})} />
-              </Form.Field>
-              <Form.Field>
-                <label>Cost</label>
+                <label>Song Cost</label>
                 <Input 
-                  label="wei"
+                  label="ETH"
                   labelPosition='right' 
                   value={this.state.cost}
                   onChange={event => this.setState({cost: event.target.value})}
