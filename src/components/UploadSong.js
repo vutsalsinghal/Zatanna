@@ -109,10 +109,10 @@ class UploadSong extends Component {
       }
 
       try{
-        await ZatannaInstance.methods.artistUploadSong(web3.utils.toWei(this.state.cost,'ether'), this.state.duration, this.state.name, this.state.genre, "s3link1", this.state.songHash).send({from:this.state.userAccount});
+        await ZatannaInstance.methods.artistUploadSong(this.state.cost, this.state.duration, this.state.name, this.state.genre, "s3link1", this.state.songHash).send({from:this.state.userAccount});
         this.setState({msg:"Song Uploaded Successfully!"});
       }catch(err){
-        //await S3Client.deleteFile(this.state.actualSong.name, config);
+        //await S3Client.deleteFile(this.state.actualSong.name, config);  ///////////////// Have to implement this!!!
         this.setState({errorMessage:err.message, msg:''});  
       }
     }else{
@@ -148,7 +148,7 @@ class UploadSong extends Component {
               <Form.Field>
                 <label>Song Cost</label>
                 <Input 
-                  label="ETH"
+                  label="wei"
                   labelPosition='right' 
                   value={this.state.cost}
                   onChange={event => this.setState({cost: event.target.value})}

@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-// Deployed at 0x84b245dc3ddb3e1ea55d36c90687772173e70732 on Ropsten
+// Deployed at 0x43a03bf3dca49657ae0657e0e6ab0e1310d8384e on Rinkeby
 
 contract Zatanna{
     address public owner;

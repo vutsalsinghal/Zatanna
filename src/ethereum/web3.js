@@ -8,10 +8,10 @@ function networkCheck(){
         alert("This is Mainnet. Please switch to Ropsten Test Network!");
         break
         case "ropsten":
-        //alert("Nice! You're now connected to Ropsten Test Network!");
+        alert("This is Ropsten test network. Please switch to Rinkeby Test Network!");
         break
         case "rinkeby":
-        alert("This is Rinkeby test network. Please switch to Ropsten Test Network!");
+        //alert("Nice! You're now connected to Rinkeby Test Network!");
         break
       case "kovan":
         alert("This is Kovan test network. Please switch to Ropsten Test Network!");
@@ -29,7 +29,7 @@ if (typeof window !== 'undefined' && typeof window.web3 !== 'undefined') {
 }else{
   // We are on the server *OR* the user is not running metamask
   alert("Please Install MetaMask from metamask.io");
-  const provider = new Web3.providers.HttpProvider('https://ropsten.infura.io/fmYYH0aPRKNF5MFSuVNH');
+  const provider = new Web3.providers.HttpProvider('https://rinkeby.infura.io/fmYYH0aPRKNF5MFSuVNH');
   web3 = new Web3(provider);
 }
 

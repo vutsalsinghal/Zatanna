@@ -27,12 +27,13 @@ class SongList extends Component {
         let songList = [];
 
         const lastSong = await ZatannaInstance.methods.lastSong().call({from:accounts[0]});
-
-        for (var i=1; i<=lastSong; i++){
-          let { id, name, cost, releaseDate, genere, s3Link} = await ZatannaInstance.methods.songDetail(i).call({from:accounts[0]});
-          songList.push([id, name, cost, releaseDate, genere, s3Link]);
-        }
         
+        if (lastSong > 0){
+          for (var i=1; i<=lastSong; i++){
+            let { id, name, cost, releaseDate, genere, s3Link} = await ZatannaInstance.methods.songDetail(i).call({from:accounts[0]});
+            songList.push([id, name, cost, releaseDate, genere, s3Link]);
+          }
+        }
         this.setState({lastSong, songList});
       }
 
@@ -44,26 +45,38 @@ class SongList extends Component {
   }
 
   renderSongs = () => {
-    const items = this.state.songList.map((song,id) => {      
-      var date = new Date(song[3]*1000);
-      var year = date.getFullYear();
-      var month = "0" + (date.getMonth()+1);
-      var day = date.getDate();
+    let items;
 
-      var formattedDate = day + '-' + month.substr(-2) + '-' + year;
+    if (this.state.lastSong > 0){
+      items = this.state.songList.map((song,id) => {
+        var date = new Date(song[3]*1000);
+        var year = date.getFullYear();
+        var month = "0" + (date.getMonth()+1);
+        var day = date.getDate();
 
+        var formattedDate = day + '-' + month.substr(-2) + '-' + year;
+
+        return (
+          <Card key={id} href={'/Zatanna/songs/detail/'+song[0]}>
+            <Card.Content>
+              <Card.Header>{song[1]}</Card.Header>
+              <Card.Meta>
+                <span>Cost: {web3.utils.fromWei(song[2],'ether')} ETH</span>
+              </Card.Meta>
+              <Card.Description>Release Date: {formattedDate}</Card.Description>
+            </Card.Content>
+          </Card>
+        );
+      });
+    }else{
       return (
-        <Card key={id}>
+        <Card>
           <Card.Content>
-            <Card.Header>{song[1]}</Card.Header>
-            <Card.Meta>
-              <span>Cost: {web3.utils.fromWei(song[2],'ether')} ETH</span>
-            </Card.Meta>
-            <Card.Description>Release Date: {formattedDate}</Card.Description>
+            <Card.Header>No Songs yet!</Card.Header>
           </Card.Content>
         </Card>
       );
-    });
+    }
 
     return <Card.Group>{items}</Card.Group>;
   }

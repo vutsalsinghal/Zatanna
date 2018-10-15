@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import Home from './components/Home';
 import UploadSong from './components/UploadSong';
 import SongList from './components/SongList';
+import SongDetail from './components/SongDetail';
 
 class App extends Component {
   render() {
@@ -12,8 +13,9 @@ class App extends Component {
         <Layout>
           <Switch>
             <Route exact path="/Zatanna" component={Home} />
-            <Route path="/Zatanna/uploadSong" component={UploadSong} />
-            <Route path="/Zatanna/songs" component={SongList} />
+            <Route exact path="/Zatanna/uploadSong" component={UploadSong} />
+            <Route exact path="/Zatanna/songs" component={SongList} />
+            <Route exact path="/Zatanna/songs/detail/:id" component={SongDetail} />
           </Switch>
         </Layout>
       </BrowserRouter>
