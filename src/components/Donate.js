@@ -3,30 +3,23 @@ import {Loader, Dimmer, Message, Form, Input, Button} from 'semantic-ui-react';
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 
-class RegisterArtist extends Component {
+class Donate extends Component {
   state = {
     loadingData:false,
     loading:false,
     errorMessage:'',
-    artistName:'',
+    amount:'',
     msg:'',
   }
 
   onSubmit = async event => {
     event.preventDefault();
-
     this.setState({errorMessage:'', loading:true, msg:''});
 
     try{
-      const accounts = await web3.eth.getAccounts();
-      const role = await ZatannaInstance.methods.getRole().call({from:accounts[0]});
-
-      if (role === '0'){
-        await ZatannaInstance.methods.artistRegister(this.state.artistName).send({from:accounts[0], value: web3.utils.toWei('0.05','ether')});
-        this.setState({msg:"You've Successfully registered as an Artist"});
-      }else{
-        if (role === '1') {this.setState({errorMessage:"You've already registered as an Artist"});}
-        else {this.setState({errorMessage:"You've already registered as a User"});}
+      if (this.props.role === '2'){
+        await ZatannaInstance.methods.donate(this.props.artistID).send({from:this.props.userAccount, value: web3.utils.toWei(this.state.amount,'ether')});
+        this.setState({msg:"You've Successfully donted to "+this.props.artistName});
       }
     }catch(err){
       this.setState({errorMessage:err.message, msg:''});
@@ -56,11 +49,11 @@ class RegisterArtist extends Component {
       <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
         <Form.Group>
           <Form.Field width={12}>
-            <label>Enter Your Name</label>
-            <Input value={this.state.value} onChange={event => this.setState({artistName:event.target.value})} />
+            <label>Enter Donation Amount</label>
+            <Input label="ETH" labelPosition='right' onChange={event => this.setState({amount:event.target.value})} />
           </Form.Field>
-          <Button size='small' floated='right' primary basic loading={this.state.loading}>
-            Register
+          <Button size='small' floated='right' primary loading={this.state.loading}>
+            Donate
           </Button>
         </Form.Group>
         <Message error header="Oops!" content={this.state.errorMessage} />
@@ -70,4 +63,4 @@ class RegisterArtist extends Component {
   }
 }
 
-export default RegisterArtist;
+export default Donate;

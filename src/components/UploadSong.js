@@ -149,7 +149,7 @@ class UploadSong extends Component {
                 <label>Song Cost</label>
                 <Input 
                   label="wei"
-                  labelPosition='right' 
+                  labelPosition='right'
                   value={this.state.cost}
                   onChange={event => this.setState({cost: event.target.value})}
                 />

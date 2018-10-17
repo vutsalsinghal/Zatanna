@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-// Deployed at 0x43a03bf3dca49657ae0657e0e6ab0e1310d8384e on Rinkeby
+// Deployed at 0x26f05c41a24a4f393584fea897ace39deb2281c2 on Rinkeby
 
 contract Zatanna{
     address public owner;
@@ -66,7 +66,8 @@ contract Zatanna{
         role[msg.sender] = ROLE.USER;                                           // Update role
     }
      
-    function artistRegister(string _name) external{
+    function artistRegister(string _name) external payable{
+        require(msg.value == 0.05 ether);
         require(artistId[msg.sender] == 0, 'Already registered!');
         lastArtist += 1;
         
@@ -117,12 +118,17 @@ contract Zatanna{
     }
      
     // Returns song details
-    function songDetail(uint _songId) view external returns(uint id, string name, uint cost, uint releaseDate, string genre, string s3link){
+    function songDetail(uint _songId) view external returns(uint artistID, uint id, string name, uint cost, uint releaseDate, string genre, string s3link){
         id = idToSong[_songId].id;
+        artistID = idToSong[_songId].artistId;
         name = idToSong[_songId].name;
         cost = idToSong[_songId].cost;
         releaseDate = idToSong[_songId].releaseDate;
         genre = idToSong[_songId].genre;
         s3link = idToSong[_songId].s3link;
+    }
+    
+    function donate(uint artistID) public payable{
+        idToArtist[artistID].artistAddress.transfer(msg.value);                 // Transfer money to artist
     }
 }
