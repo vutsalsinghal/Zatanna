@@ -25,7 +25,7 @@ class UploadSong extends Component {
 
   async componentDidMount(){
     this.setState({loadingData:true});
-    document.title = "Zatanna | Upload Song";
+    document.title = "Zatanna | Song Upload";
 
     try{
       const accounts = await web3.eth.getAccounts();
@@ -82,7 +82,7 @@ class UploadSong extends Component {
     if (parseInt(isUnique,10) === 0){
       this.setState({actualSong:file});
     }else{
-      this.setState({errorMessage:"The song that you're uploading has already been uploaded. Piracy is a punishable offence!"})
+      this.setState({errorMessage:"The song that you're uploading has already been uploaded. If this is not your song then keep in mind that piracy is a punishable offence!"})
     }
 
     this.setState({loading:false});
@@ -112,7 +112,7 @@ class UploadSong extends Component {
         await ZatannaInstance.methods.artistUploadSong(this.state.cost, this.state.duration, this.state.name, this.state.genre, "s3link1", this.state.songHash).send({from:this.state.userAccount});
         this.setState({msg:"Song Uploaded Successfully!"});
       }catch(err){
-        //await S3Client.deleteFile(this.state.actualSong.name, config);  ///////////////// Have to implement this!!!
+        //await S3Client.deleteFile(this.state.actualSong.name, config);  ////////////////// Have to implement this!!!
         this.setState({errorMessage:err.message, msg:''});  
       }
     }else{
