@@ -3,6 +3,7 @@ import {Loader, Dimmer, Card, Grid, Button, Icon, Modal} from 'semantic-ui-react
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 import Donate from './Donate';
+import ReactAudioPlayer from 'react-audio-player';
 
 class SongDetail extends Component {
   state = {
@@ -60,7 +61,7 @@ class SongDetail extends Component {
       return (
         <Card>
           <Card.Content>
-            <Card.Header>{this.state.name}</Card.Header>
+            <Card.Header>{this.state.name.split('.')[0]}</Card.Header>
             <Card.Meta>
               <span>Cost: {web3.utils.fromWei(this.state.cost,'ether')} ETH</span>
             </Card.Meta>
@@ -93,6 +94,13 @@ class SongDetail extends Component {
             <Grid stackable>
               <Grid.Column width={12}>
                 {this.renderSong()}
+                <ReactAudioPlayer
+                  src={"https://s3.amazonaws.com/zatanna-music-upload/songs/"+this.state.name.split(' ').join('+')}
+                  controls
+                  controlsList="nodownload"
+                  volume={0.01}
+                  autoPlay
+                />
               </Grid.Column>
               {!this.state.errorMessage &&
                 <Grid.Column width={4}>
