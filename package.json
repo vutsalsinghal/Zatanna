@@ -6,6 +6,8 @@
   "dependencies": {
     "@linniaprotocol/linnia-js": "^0.2.0",
     "aws-s3": "file:aws-s3-patch-1",
+    "aws4": "^1.8.0",
+    "axios": "^0.18.0",
     "fs-extra": "^7.0.0",
     "gh-pages": "^2.0.0",
     "ipfs-mini": "^1.1.2",

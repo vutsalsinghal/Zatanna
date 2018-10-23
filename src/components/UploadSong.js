@@ -5,15 +5,9 @@ import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 import S3Client from 'aws-s3';
 import SparkMD5 from 'spark-md5';
-/*
-var AWS = require('aws-sdk');
-AWS.config = new AWS.Config();
-AWS.config.accessKeyId = configuration.accessKeyId;
-AWS.config.secretAccessKey = configuration.secretAccessKey;
-AWS.config.region = "us-east-1";
+import axios from 'axios';
+import aws4 from 'aws4';
 
-var s3 = new AWS.S3();
-*/
 var Buffer = require('buffer/').Buffer
 class UploadSong extends Component {
   state = {
@@ -49,7 +43,7 @@ class UploadSong extends Component {
 
   fileCapture = (file) => {
     this.setState({errorMessage:'', loading:true, msg:'', name:file.name});
-    
+
     if (typeof file !== 'undefined'){
       if (file.type.split('/')[0] === 'audio'){
         try{
@@ -107,7 +101,7 @@ class UploadSong extends Component {
         region: 'us-east-1',
         accessKeyId: configuration.accessKeyId,
         secretAccessKey: configuration.secretAccessKey,
-        dirName: 'songs', // optional
+        dirName: 'songs',
       }
       
       try{
@@ -121,20 +115,39 @@ class UploadSong extends Component {
         await ZatannaInstance.methods.artistUploadSong(this.state.cost, this.state.duration, this.state.name, this.state.genre, "s3link1", this.state.songHash).send({from:this.state.userAccount});
         this.setState({msg:"Song Uploaded Successfully!"});
       }catch(err){
-        //////////
-        ////////// HAVE TO IMPLEMENT THIS!!!
-        //////////
-        
-        /*
-        let deleteResponse = await S3Client.deleteFile(this.state.actualSong.name.split(' ').join('+'), config);
-        console.log(deleteResponse);
+        // If error, delete the uploaded song from S3!
 
-        var deleteParams = {Bucket:'zatanna-music-upload', Key:'songs/' + this.state.actualSong.name.split(' ').join('+')};
-        let deleteResponse = await s3.deleteObject(deleteParams);
-        console.log(deleteResponse);
+        let request = {
+          'action':"deleteS3File",
+          'bucket':"zatanna-music-upload",
+          'key':"songs/"+this.state.name
+        }
+
+        let signedRequest = aws4.sign({
+          host: 'fratlyat06.execute-api.us-east-1.amazonaws.com',
+          method:'POST',
+          url:'https://fratlyat06.execute-api.us-east-1.amazonaws.com/v1/my-resource/',
+          path:'/v1/my-resource',
+          headers: {
+          'content-type': 'application/json',
+          'x-api-key':configuration.apiKey,
+          },
+          secretAccessKey: configuration.accessKeyId,
+          accessKeyId: configuration.secretAccessKey,
+          data:request,
+          body:request
+        })
+
+        delete signedRequest.headers['Host']
+        delete signedRequest.headers['Content-Length']
+
+        try{
+          await axios(signedRequest);
+        }catch(err){
+          console.log(err);
+        }
 
         this.setState({errorMessage:err.message, msg:''});
-        */
       }
     }else{
       this.setState({errorMessage:"You're not registered as an Artist!"});
