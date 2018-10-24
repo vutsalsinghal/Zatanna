@@ -69,7 +69,7 @@ class Home extends Component {
                     
                     <Modal size='small'
                       trigger={
-                        <Button icon labelPosition='left' className="primary" floated="right">
+                        <Button icon labelPosition='right' className="primary" floated="right">
                         <Icon name='user' />
                         Artist
                         </Button>

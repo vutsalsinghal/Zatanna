@@ -106,7 +106,6 @@ class UploadSong extends Component {
       
       try{
         let uploadResponse = await S3Client.uploadFile(this.state.actualSong, config); // Thanks to https://github.com/Fausto95/aws-s3
-        console.log(uploadResponse);
       }catch(err){
         this.setState({errorMessage:err.message, msg:''});
       }
