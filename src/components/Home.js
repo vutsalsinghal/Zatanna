@@ -122,8 +122,15 @@ class Home extends Component {
                     Discover Songs
                   </Button>
                 </Link>
+                <Link to='/Zatanna/mySongs'>
+                  <Button basic icon labelPosition='left' className="primary">
+                    <Icon name='cart arrow down' />
+                    My Songs
+                  </Button>
+                </Link>
               </Card.Content>
             </Card>
+            <h3>Recommended Songs</h3>
           </Grid>
         }
       </div>

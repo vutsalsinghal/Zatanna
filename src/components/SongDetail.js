@@ -3,7 +3,6 @@ import {Loader, Dimmer, Card, Grid, Button, Icon, Modal} from 'semantic-ui-react
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 import Donate from './Donate';
-import ReactAudioPlayer from 'react-audio-player';
 
 class SongDetail extends Component {
   state = {
@@ -15,6 +14,7 @@ class SongDetail extends Component {
     releaseDate:'',
     genere:'',
     s3Link:'',
+    role:'',
     userAccount:'',
     loadingData:false,
     loading:false,
@@ -32,12 +32,12 @@ class SongDetail extends Component {
       this.setState({role:role, userAccount:accounts[0]});
 
       if (role === '2'){
-        let {artistID, id, name, cost, releaseDate, genere, s3Link} = await ZatannaInstance.methods.songDetail(this.props.match.params.id).call({from:accounts[0]});        
+        let {artistID, id, name, cost, releaseDate, genere, s3Link} = await ZatannaInstance.methods.songDetail(this.props.match.params.id).call({from:accounts[0]});
         
         if (id !== '0'){  // i.e song exists!
           // Get artist details
           let artistDets = await ZatannaInstance.methods.artistDetail(artistID).call({from:accounts[0]});
-          this.setState({artistID, artistName:artistDets[0], id ,name,cost,releaseDate, genere, s3Link});
+          this.setState({artistID, artistName:artistDets[0], id, name, cost, releaseDate, genere, s3Link});
         }else{
           this.setState({errorMessage:'Song does not exists!'});
         }
@@ -94,13 +94,7 @@ class SongDetail extends Component {
             <Grid stackable>
               <Grid.Column width={12}>
                 {this.renderSong()}
-                <ReactAudioPlayer
-                  src={"https://s3.amazonaws.com/zatanna-music-upload/songs/"+this.state.name.split(' ').join('+')}
-                  controls
-                  controlsList="nodownload"
-                  volume={0.01}
-                  autoPlay
-                />
+                <h3>Similar Songs</h3>
               </Grid.Column>
               {!this.state.errorMessage &&
                 <Grid.Column width={4}>

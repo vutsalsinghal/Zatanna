@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import {Loader, Dimmer, Card} from 'semantic-ui-react';
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
+import ReactAudioPlayer from 'react-audio-player';
 
-class SongList extends Component {
+class mySongs extends Component {
   state = {
-    lastSong:'',
-    songList:[],
+    userID:'',
+    purchasedSongs:[],
     role:'',
     userAccount:'',
     loadingData:false,
@@ -17,7 +18,7 @@ class SongList extends Component {
 
   async componentDidMount(){
     this.setState({loadingData:true});
-    document.title = "Zatanna | Songs";
+    document.title = "Zatanna | My Songs";
 
     try{
       const accounts = await web3.eth.getAccounts();
@@ -25,17 +26,16 @@ class SongList extends Component {
       this.setState({role:role, userAccount:accounts[0]});
 
       if (role === '2'){
-        let songList = [];
-
-        const lastSong = await ZatannaInstance.methods.lastSong().call({from:accounts[0]});
+        let purchasedSongs = [];
+        let user_details = await ZatannaInstance.methods.userDetail().call({from:accounts[0]});
         
-        if (lastSong > 0){
-          for (var i=1; i<=lastSong; i++){
-            let {artistID, id, name, cost, releaseDate, genere, s3Link} = await ZatannaInstance.methods.songDetail(i).call({from:accounts[0]});
-            songList.push([id, name, cost, releaseDate, genere, s3Link]);
-          }
+        for (var i=0; i<user_details[1].length; i++){
+          let song = await ZatannaInstance.methods.songDetail(user_details[1][i]).call({from:accounts[0]});
+          purchasedSongs.push(song);
+          //let {artistID, id, name, cost, releaseDate, genere, s3Link} = await ZatannaInstance.methods.songDetail(i).call({from:accounts[0]});
         }
-        this.setState({lastSong, songList});
+
+        this.setState({purchasedSongs});
       }
 
     }catch(err){
@@ -48,9 +48,9 @@ class SongList extends Component {
   renderSongs = () => {
     let items;
 
-    if (this.state.lastSong > 0){
-      items = this.state.songList.map((song,id) => {
-        var date = new Date(song[3]*1000);
+    if (this.state.purchasedSongs.length > 0){
+      items = this.state.purchasedSongs.map((song,id) => {
+        var date = new Date(song[4]*1000);
         var year = date.getFullYear();
         var month = "0" + (date.getMonth()+1);
         var day = date.getDate();
@@ -58,13 +58,19 @@ class SongList extends Component {
         var formattedDate = day + '-' + month.substr(-2) + '-' + year;
 
         return (
-          <Card key={id} href={'/Zatanna/songs/detail/'+song[0]}>
+          <Card key={id} href={'/Zatanna/songs/detail/'+song[1]}>
             <Card.Content>
-              <Card.Header>{song[1].split('.')[0]}</Card.Header>
+              <Card.Header>{song[2].split('.')[0]}</Card.Header>
               <Card.Meta>
-                <span>Cost: {web3.utils.fromWei(song[2],'ether')} ETH</span>
+                <span>Cost: {web3.utils.fromWei(song[3],'ether')} ETH</span>
               </Card.Meta>
               <Card.Description>Release Date: {formattedDate}</Card.Description>
+              <ReactAudioPlayer
+                src={"https://s3.amazonaws.com/zatanna-music-upload/songs/"+song[2].split(' ').join('+')}
+                controls
+                controlsList="nodownload"
+                volume={0.03}
+              />
             </Card.Content>
           </Card>
         );
@@ -95,7 +101,7 @@ class SongList extends Component {
       <div>
         {this.state.role==='2' &&
           <div>  
-            <h2>Discover The Expanse!</h2>
+            <h2>List of Purchased Songs</h2>
             {this.renderSongs()}
           </div>
         }
@@ -108,4 +114,4 @@ class SongList extends Component {
   }
 }
 
-export default SongList;
+export default mySongs;

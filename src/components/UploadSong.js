@@ -27,7 +27,7 @@ class UploadSong extends Component {
 
   async componentDidMount(){
     this.setState({loadingData:true});
-    document.title = "Zatanna | Song Upload";
+    document.title = "Zatanna | Upload Song";
 
     try{
       const accounts = await web3.eth.getAccounts();
