@@ -52,7 +52,7 @@ class Donate extends Component {
             <label>Enter Donation Amount</label>
             <Input label="ETH" labelPosition='right' onChange={event => this.setState({amount:event.target.value})} />
           </Form.Field>
-          <Button size='small' floated='right' primary loading={this.state.loading}>
+          <Button size='small' floated='right' primary loading={this.state.loading} disabled={this.state.loading}>
             Donate
           </Button>
         </Form.Group>

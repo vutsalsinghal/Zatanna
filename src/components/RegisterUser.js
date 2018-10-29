@@ -55,7 +55,7 @@ class RegisterUser extends Component {
     return (
       <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
         <Message error header="Oops!" content={this.state.errorMessage} />
-        <Button primary basic loading={this.state.loading}>
+        <Button primary basic loading={this.state.loading} disabled={this.state.loading}>
           Register
         </Button>
         {statusMessage}

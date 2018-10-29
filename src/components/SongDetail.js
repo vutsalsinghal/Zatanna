@@ -3,6 +3,7 @@ import {Loader, Dimmer, Card, Grid, Button, Icon, Modal} from 'semantic-ui-react
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 import Donate from './Donate';
+import BuySong from './BuySong';
 
 class SongDetail extends Component {
   state = {
@@ -98,18 +99,33 @@ class SongDetail extends Component {
               </Grid.Column>
               {!this.state.errorMessage &&
                 <Grid.Column width={4}>
-                  <Modal size='small'
-                    trigger={
-                    <Button icon labelPosition='left' className="primary" floated="right">
-                      <Icon name='users' />
-                      Donate
-                    </Button>
-                    }>
-                    <Modal.Header>Donate to the {this.state.artistName}</Modal.Header>
-                    <Modal.Content>
-                      <Donate role={this.state.role} userAccount={this.state.userAccount} artistID={this.state.artistID} artistName={this.state.artistName} />
-                    </Modal.Content>
-                  </Modal>
+                  <Button.Group vertical>
+                    <Modal size='small'
+                      trigger={
+                      <Button icon labelPosition='left' className="primary" floated="right" basic>
+                        <Icon name='ethereum' />
+                        Donate
+                      </Button>
+                      }>
+                      <Modal.Header>Donate to {this.state.artistName}</Modal.Header>
+                      <Modal.Content>
+                        <Donate role={this.state.role} userAccount={this.state.userAccount} artistID={this.state.artistID} artistName={this.state.artistName} />
+                      </Modal.Content>
+                    </Modal>
+
+                    <Modal size='small'
+                      trigger={
+                      <Button icon labelPosition='left' className="primary" floated="right" basic>
+                        <Icon name='heart outline' />
+                        Buy Song
+                      </Button>
+                      }>
+                      <Modal.Header>Buy This Song</Modal.Header>
+                      <Modal.Content>
+                        <BuySong role={this.state.role} userAccount={this.state.userAccount} songCost={this.state.cost} songID={this.state.id} songName={this.state.name} />
+                      </Modal.Content>
+                    </Modal>
+                  </Button.Group>
                 </Grid.Column>
               }
             </Grid>
