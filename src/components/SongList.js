@@ -32,7 +32,7 @@ class SongList extends Component {
         if (lastSong > 0){
           for (var i=1; i<=lastSong; i++){
             let {artistID, id, name, cost, releaseDate, genere, s3Link} = await ZatannaInstance.methods.songDetail(i).call({from:accounts[0]});
-            songList.push([id, name, cost, releaseDate, genere, s3Link]);
+            songList.push([id, name, cost, releaseDate, genere, s3Link, artistID]);
           }
         }
         this.setState({lastSong, songList});

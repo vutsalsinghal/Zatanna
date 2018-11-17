@@ -10,6 +10,7 @@ class Home extends Component {
     state = {
     loadingData:false,
     role:'',
+    account:'',
   }
 
   async componentDidMount(){
@@ -19,7 +20,7 @@ class Home extends Component {
     try{
       const accounts = await web3.eth.getAccounts();
       const role = await ZatannaInstance.methods.getRole().call({from:accounts[0]});
-      this.setState({role});
+      this.setState({role, account:accounts[0]});
     }catch(err){
       console.log(err);
     }
@@ -61,7 +62,7 @@ class Home extends Component {
                       }>
                       <Modal.Header>Register as a User to Discover Music</Modal.Header>
                       <Modal.Content>
-                        <RegisterUser />
+                        <RegisterUser account={this.state.account} role={this.state.role} />
                       </Modal.Content>
                     </Modal>
 
@@ -76,7 +77,7 @@ class Home extends Component {
                       }>
                       <Modal.Header>Register as an Artist</Modal.Header>
                       <Modal.Content>
-                        <RegisterArtist />
+                        <RegisterArtist account={this.state.account} role={this.state.role} />
                       </Modal.Content>
                     </Modal>
                   </Button.Group>

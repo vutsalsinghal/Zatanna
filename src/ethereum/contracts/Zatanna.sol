@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-// Deployed at 0x26f05c41a24a4f393584fea897ace39deb2281c2 on Rinkeby
+// Deployed at 0xc0f06264f21b283f2c8d8eb411fe768fe236f8dc on Rinkeby
 
 contract Zatanna{
     address public owner;
@@ -9,26 +9,25 @@ contract Zatanna{
     uint public lastArtist;
  
     struct User{
-        uint id;
+        uint uID;
+        string uName;
         uint[] purchasedSongs;
     }
  
     struct Artist{
         string name;
         address artistAddress;
-        uint id;
+        uint aID;
         uint[] songsUploaded;
     }
  
     struct Song{
         uint artistId;
         uint cost;
-        uint id;
-        uint duration;
+        uint sID;
         uint releaseDate;
         string name;
         string genre;
-        string s3link;
     }
  
     enum ROLE {UNREGISTERED, ARTIST, USER}                                      // Keep track of type of user
@@ -53,15 +52,15 @@ contract Zatanna{
     }
     
     function songIsUnique(string _hash) view external returns(uint){
-        return hashToSong[_hash].id;
+        return hashToSong[_hash].sID;
     }
      
-    function userRegister() external{
-        require(userId[msg.sender].id == 0, 'Already registered!');
+    function userRegister(string _uName) external{
+        require(userId[msg.sender].uID == 0, 'Already registered!');
         
         lastUser += 1;
         
-        User memory newUser = User(lastUser, new uint[](0));
+        User memory newUser = User(lastUser,_uName, new uint[](0));
         userId[msg.sender] = newUser;
         role[msg.sender] = ROLE.USER;                                           // Update role
     }
@@ -80,25 +79,25 @@ contract Zatanna{
      
      
     // Add Song details and update Artist's details
-    function artistUploadSong(uint _cost, uint _duration, string _name, string _genre, string _s3link, string songHash) external{
+    function artistUploadSong(uint _cost, string _name, string _genre, string songHash) external{
         require(role[msg.sender] == ROLE.ARTIST, 'Not an artist');              // Only people registered as artists can upload
         require(artistId[msg.sender] != 0, 'Not a registered Artist');          // Has to be a registered artist
-        require(hashToSong[songHash].id == 0, "Can't upload duplicate");        // Has to be a unique song
+        require(hashToSong[songHash].sID == 0, "Can't upload duplicate");        // Has to be a unique song
     
         lastSong += 1;
         
-        Artist artistInstance = idToArtist[artistId[msg.sender]];
+        Artist storage artistInstance = idToArtist[artistId[msg.sender]];
         artistInstance.songsUploaded.push(lastSong);                            // Update Artist instance
     
         // Map SongID to Song
-        idToSong[lastSong] = Song(artistInstance.id, _cost, lastSong, _duration, now, _name, _genre, _s3link);
+        idToSong[lastSong] = Song(artistInstance.aID, _cost, lastSong, now, _name, _genre);
         hashToSong[songHash] = idToSong[lastSong];                              // Update hashToSong dictionary
     }
      
     // When user buys song
      function userBuySong(uint songID) payable external{
         require(role[msg.sender] == ROLE.USER, 'Not a user');                   // Only people registered as USERS can purchase
-        require(idToSong[songID].id != 0, 'Song does not exists!');
+        require(idToSong[songID].sID != 0, 'Song does not exists!');
         require(msg.value == idToSong[songID].cost);                            // Check if song cost is paid
         
         userId[msg.sender].purchasedSongs.push(songID);
@@ -108,8 +107,8 @@ contract Zatanna{
     }
      
     // Returns user profile
-    function userDetail() view external returns(uint, uint[]){
-        return (userId[msg.sender].id, userId[msg.sender].purchasedSongs);
+    function userDetail() view external returns(uint, string, uint[]){
+        return (userId[msg.sender].uID, userId[msg.sender].uName, userId[msg.sender].purchasedSongs);
     }
      
     // When user checks Artist's profile
@@ -118,14 +117,13 @@ contract Zatanna{
     }
      
     // Returns song details
-    function songDetail(uint _songId) view external returns(uint artistID, uint id, string name, uint cost, uint releaseDate, string genre, string s3link){
-        id = idToSong[_songId].id;
+    function songDetail(uint _songId) view external returns(uint artistID, uint id, string name, uint cost, uint releaseDate, string genre){
+        id = idToSong[_songId].sID;
         artistID = idToSong[_songId].artistId;
         name = idToSong[_songId].name;
         cost = idToSong[_songId].cost;
         releaseDate = idToSong[_songId].releaseDate;
         genre = idToSong[_songId].genre;
-        s3link = idToSong[_songId].s3link;
     }
     
     function donate(uint artistID) public payable{

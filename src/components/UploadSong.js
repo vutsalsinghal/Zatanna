@@ -1,28 +1,45 @@
 import React, { Component } from 'react';
-import {Loader, Dimmer, Message, Form, Input, Button} from 'semantic-ui-react';
-import configuration from '../config';
-import web3 from '../ethereum/web3';
-import ZatannaInstance from '../ethereum/Zatanna';
+import {Loader, Dimmer, Message, Form, Input, Button, Dropdown} from 'semantic-ui-react';
 import S3Client from 'aws-s3';
 import SparkMD5 from 'spark-md5';
 import axios from 'axios';
-import aws4 from 'aws4';
+import configuration from '../config';
+import web3 from '../ethereum/web3';
+import ZatannaInstance from '../ethereum/Zatanna';
+import {awsSigning} from '../utils.js'
+
+const genreOptions = [
+  {key:'country',text:'Country',value:'country'},
+  {key:'classical',text:'Classical',value:'classical'},
+  {key:'blues',text:'Blues',value:'blues'},
+  {key:'dance',text:'Dance',value:'dance'},
+  {key:'electronic',text:'Electronic',value:'electronic'},
+  {key:'hiphop',text:'Hip-Hop',value:'hiphop'},
+  {key:'rap',text:'Rap',value:'rap'},
+  {key:'jazz',text:'Jazz',value:'jazz'},
+  {key:'latin',text:'Latin',value:'latin'},
+  {key:'opera',text:'Opera',value:'opera'},
+  {key:'pop',text:'Pop',value:'pop'},
+  {key:'rbsoul',text:'R&B/Soul',value:'rbsoul'},
+  {key:'reggae',text:'Reggae',value:'reggae'},
+  {key:'rock',text:'Rock',value:'rock'},
+  {key:'metal',text:'Metal',value:'metal'}
+]
 
 var Buffer = require('buffer/').Buffer
 class UploadSong extends Component {
   state = {
-    name:'',
-    cost:'',
-    duration:'',
-    genre:'',
-    role:'',
-    songHash:'',
-    actualSong:'',
-    userAccount:'',
-    loadingData:false,
-    loading:false,
-    errorMessage:'',
-    msg:'',
+  name:'',
+  cost:'',
+  genre:'',
+  role:'',
+  songHash:'',
+  actualSong:'',
+  userAccount:'',
+  loadingData:false,
+  loading:false,
+  errorMessage:'',
+  msg:'',
   }
 
   async componentDidMount(){
@@ -39,39 +56,39 @@ class UploadSong extends Component {
     }
 
     this.setState({loadingData:false});
-  }
+    }
 
-  fileCapture = (file) => {
+    fileCapture = (file) => {
     this.setState({errorMessage:'', loading:true, msg:'', name:file.name});
 
     if (typeof file !== 'undefined'){
       if (file.type.split('/')[0] === 'audio'){
-        try{
-          let reader = new window.FileReader()
-          reader.readAsArrayBuffer(file)
-          reader.onloadend = async () => {
-            const buffer = Buffer.from(reader.result);
-            var spark = new SparkMD5.ArrayBuffer();
-            spark.append(buffer);
-            let hash = spark.end();
-            this.setState({songHash:hash.toString()});
-          }
-
-          const tmr = setInterval(() => {
-            if (this.state.songHash === '') {
-              // pass
-            }else{
-              clearInterval(tmr);
-              this.checkUnique(file);
-            }
-          }, 1000);
-
-        }catch(err){
-          console.log("error: ",err.message);
+      try{
+        let reader = new window.FileReader()
+        reader.readAsArrayBuffer(file)
+        reader.onloadend = async () => {
+          const buffer = Buffer.from(reader.result);
+          var spark = new SparkMD5.ArrayBuffer();
+          spark.append(buffer);
+          let hash = spark.end();
+          this.setState({songHash:hash.toString()});
         }
+
+        const tmr = setInterval(() => {
+        if (this.state.songHash === '') {
+          // pass
+        }else{
+          clearInterval(tmr);
+          this.checkUnique(file);
+        }
+        }, 1000);
+
+      }catch(err){
+        console.log("error: ",err.message);
+      }
       }else{
-        this.setState({errorMessage:'Not a audio file!'});
-        this.setState({loading:false});
+      this.setState({errorMessage:'Not a audio file!'});
+      this.setState({loading:false});
       }
     }else{
       this.setState({errorMessage:'No file selected!'});
@@ -91,6 +108,7 @@ class UploadSong extends Component {
   }
 
   onSubmit = async (event) => {
+    console.log(this.state.genre);
     event.preventDefault();
 
     this.setState({errorMessage:'', loading:true, msg:''});
@@ -105,13 +123,13 @@ class UploadSong extends Component {
       }
       
       try{
-        let uploadResponse = await S3Client.uploadFile(this.state.actualSong, config); // Thanks to https://github.com/Fausto95/aws-s3
+        await S3Client.uploadFile(this.state.actualSong, config); // Thanks to https://github.com/Fausto95/aws-s3
       }catch(err){
         this.setState({errorMessage:err.message, msg:''});
       }
 
       try{
-        await ZatannaInstance.methods.artistUploadSong(this.state.cost, this.state.duration, this.state.name, this.state.genre, "s3link1", this.state.songHash).send({from:this.state.userAccount});
+        await ZatannaInstance.methods.artistUploadSong(this.state.cost,this.state.name, this.state.genre, this.state.songHash).send({from:this.state.userAccount});
         this.setState({msg:"Song Uploaded Successfully!"});
       }catch(err){
         // If error, delete the uploaded song from S3!
@@ -122,28 +140,11 @@ class UploadSong extends Component {
           'key':"songs/"+this.state.name
         }
 
-        let signedRequest = aws4.sign({
-          host: 'fratlyat06.execute-api.us-east-1.amazonaws.com',
-          method:'POST',
-          url:'https://fratlyat06.execute-api.us-east-1.amazonaws.com/v1/my-resource/',
-          path:'/v1/my-resource',
-          headers: {
-          'content-type': 'application/json',
-          'x-api-key':configuration.apiKey,
-          },
-          secretAccessKey: configuration.accessKeyId,
-          accessKeyId: configuration.secretAccessKey,
-          data:request,
-          body:request
-        })
-
-        delete signedRequest.headers['Host']
-        delete signedRequest.headers['Content-Length']
-
+        let signedRequest = awsSigning(request,'v1/s3action');
         try{
-          await axios(signedRequest);
-        }catch(err){
-          console.log(err);
+          axios(signedRequest);
+        }catch(e){
+          console.log(e);
         }
 
         this.setState({errorMessage:err.message, msg:''});
@@ -156,69 +157,60 @@ class UploadSong extends Component {
   }
 
   render() {
-    if(this.state.loadingData){
-      return (
-        <Dimmer active inverted>
-          <Loader size='massive'>Loading...</Loader>
-        </Dimmer>
-      );
-    }
-
-    let statusMessage;
-
-    if (this.state.msg === ''){
-      statusMessage = null;
-    }else{
-      statusMessage = <Message floating positive header="Success!" content={this.state.msg} />;
-    }
-
+  if(this.state.loadingData){
     return (
-      <div>
-        {this.state.role==='1' &&
-          <div>  
-            <h2>Upload Your Creation!</h2>
-            <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
-              <Form.Field>
+    <Dimmer active inverted>
+      <Loader size='massive'>Loading...</Loader>
+    </Dimmer>
+    );
+  }
+
+  let statusMessage;
+
+  if (this.state.msg === ''){
+    statusMessage = null;
+  }else{
+    statusMessage = <Message floating positive header="Success!" content={this.state.msg} />;
+  }
+
+  return (
+    <div>
+      {this.state.role==='1' &&
+        <div>  
+          <h2>Upload Your Creation!</h2>
+          <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
+            <Form.Field width={10}>
+              <label>Song file</label>
+              <Input type='file' onChange={event => this.fileCapture(event.target.files[0])} />
+            </Form.Field>
+            <Form.Group>
+              <Form.Field  width={5}>
+                <label>Song Genre</label>
+                <Dropdown placeholder='Choose a Genre' options={genreOptions} search selection onChange={(k,{value}) => this.setState({genre:value})} />
+              </Form.Field>
+              <Form.Field width={5}>
                 <label>Song Cost</label>
                 <Input 
                   label="wei"
                   labelPosition='right'
                   value={this.state.cost}
                   onChange={event => this.setState({cost: event.target.value})}
-                />
+              />
               </Form.Field>
-              <Form.Field>
-                <label>Duration</label>
-                <Input 
-                  label="seconds"
-                  labelPosition='right'
-                  value={this.state.duration}
-                  onChange={event => this.setState({duration: event.target.value})}
-                />
-              </Form.Field>
-              <Form.Field>
-                <label>Song Genre</label>
-                <Input onChange={event => this.setState({genre:event.target.value})} />
-              </Form.Field>
-              <Form.Field>
-                <label>Choose the song file</label>
-                {/*<Input type='file' onChange={event => this.setState({actualSong:event.target.files[0]})} />*/}
-                <Input type='file' onChange={event => this.fileCapture(event.target.files[0])} />
-              </Form.Field>
-              <Message error header="Oops!" content={this.state.errorMessage} />
-              <Button primary basic loading={this.state.loading}>
-                Upload
-              </Button>
-              {statusMessage}
-            </Form>
-          </div>
-        }
+            </Form.Group><br/>
+            <Button primary basic loading={this.state.loading}>
+              Upload
+            </Button>
+            <Message error header="Oops!" content={this.state.errorMessage} />
+            {statusMessage}
+          </Form>
+        </div>
+      }
 
-        {this.state.role!=='1' &&
-          <h2>You are not registered as an Artist!</h2>
-        }
-      </div>
-    );
+      {this.state.role!=='1' &&
+        <h2>You are not registered as an Artist!</h2>
+      }
+    </div>);
   }
 }
 

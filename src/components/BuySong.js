@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Loader, Dimmer, Message, Form, Input, Button} from 'semantic-ui-react';
+import {Loader, Dimmer, Message, Form, Button} from 'semantic-ui-react';
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 
@@ -19,7 +19,7 @@ class BuySong extends Component {
     try{
       if (this.props.role === '2'){
         await ZatannaInstance.methods.userBuySong(this.props.songID).send({from:this.props.userAccount, value: this.props.songCost});
-        this.setState({msg:this.props.songName+" Successfully purchased!"});
+        this.setState({msg:this.props.songName.split('.')[0]+" Successfully purchased!"});
       }
     }catch(err){
       this.setState({errorMessage:err.message, msg:''});

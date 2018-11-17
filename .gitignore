@@ -13,3 +13,6 @@ build/*
 *.csv
 src/config.js
 aws-s3-patch-1/*
+
+./credentials
+*.sql

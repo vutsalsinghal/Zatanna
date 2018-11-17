@@ -18,14 +18,11 @@ class RegisterArtist extends Component {
     this.setState({errorMessage:'', loading:true, msg:''});
 
     try{
-      const accounts = await web3.eth.getAccounts();
-      const role = await ZatannaInstance.methods.getRole().call({from:accounts[0]});
-
-      if (role === '0'){
-        await ZatannaInstance.methods.artistRegister(this.state.artistName).send({from:accounts[0], value: web3.utils.toWei('0.05','ether')});
+      if (this.props.role === '0'){
+        await ZatannaInstance.methods.artistRegister(this.state.artistName).send({from:this.props.account, value: web3.utils.toWei('0.05','ether')});
         this.setState({msg:"You've Successfully registered as an Artist"});
       }else{
-        if (role === '1') {this.setState({errorMessage:"You've already registered as an Artist"});}
+        if (this.props.role === '1') {this.setState({errorMessage:"You've already registered as an Artist"});}
         else {this.setState({errorMessage:"You've already registered as a User"});}
       }
     }catch(err){

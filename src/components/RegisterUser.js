@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import {Loader, Dimmer, Message, Form, Button} from 'semantic-ui-react';
-import web3 from '../ethereum/web3';
+import {Loader, Dimmer, Message, Form, Button, Input} from 'semantic-ui-react';
 import ZatannaInstance from '../ethereum/Zatanna';
 
 class RegisterUser extends Component {
@@ -9,6 +8,7 @@ class RegisterUser extends Component {
     loading:false,
     errorMessage:'',
     msg:'',
+    userName:'',
   }
 
   onSubmit = async event => {
@@ -17,14 +17,11 @@ class RegisterUser extends Component {
     this.setState({errorMessage:'', loading:true, msg:''});
 
     try{
-      const accounts = await web3.eth.getAccounts();
-      const role = await ZatannaInstance.methods.getRole().call({from:accounts[0]});
-
-      if (role === '0'){
-        await ZatannaInstance.methods.userRegister().send({from:accounts[0]});
+      if (this.props.role === '0'){
+        await ZatannaInstance.methods.userRegister(this.state.userName).send({from:this.props.account});
         this.setState({msg:"You've Successfully registered as a User"});
       }else{
-        if (role === '1') {this.setState({errorMessage:"You've already registered as an Artist"});}
+        if (this.props.role === '1') {this.setState({errorMessage:"You've already registered as an Artist"});}
         else {this.setState({errorMessage:"You've already registered as a User"});}
       }
       
@@ -54,10 +51,16 @@ class RegisterUser extends Component {
 
     return (
       <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
+        <Form.Group>
+          <Form.Field width={12}>
+            <label>Enter Your Name</label>
+            <Input value={this.state.value} onChange={event => this.setState({userName:event.target.value})} />
+          </Form.Field>
+          <Button primary basic floated='right' loading={this.state.loading} disabled={this.state.loading}>
+            Register
+          </Button>
+        </Form.Group>
         <Message error header="Oops!" content={this.state.errorMessage} />
-        <Button primary basic loading={this.state.loading} disabled={this.state.loading}>
-          Register
-        </Button>
         {statusMessage}
       </Form>
     );

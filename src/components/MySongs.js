@@ -29,17 +29,17 @@ class mySongs extends Component {
         let purchasedSongs = [];
         let user_details = await ZatannaInstance.methods.userDetail().call({from:accounts[0]});
         
-        for (var i=0; i<user_details[1].length; i++){
-          let song = await ZatannaInstance.methods.songDetail(user_details[1][i]).call({from:accounts[0]});
+        for (var i=0; i<user_details[2].length; i++){
+          let song = await ZatannaInstance.methods.songDetail(user_details[2][i]).call({from:accounts[0]});
           purchasedSongs.push(song);
-          //let {artistID, id, name, cost, releaseDate, genere, s3Link} = await ZatannaInstance.methods.songDetail(i).call({from:accounts[0]});
+          //let {aID, sID, name, cost, releaseDate, genre} = await ZatannaInstance.methods.songDetail(i).call({from:accounts[0]});
         }
 
         this.setState({purchasedSongs});
       }
 
     }catch(err){
-      console.log(err);
+      console.log(err.message);
     }
 
     this.setState({loadingData:false});

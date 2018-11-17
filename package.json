@@ -15,7 +15,7 @@
     "react-audio-player": "^0.11.0",
     "react-dom": "^16.5.2",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "1.1.5",
+    "react-scripts": "^2.1.1",
     "semantic-ui-css": "^2.4.0",
     "semantic-ui-react": "^0.82.5",
     "solc": "^0.4.25",
@@ -33,5 +33,11 @@
   },
   "devDependencies": {
     "uglify-js": "^2.8.29"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
