@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import {Loader, Dimmer, Message, Form, Button, Input} from 'semantic-ui-react';
+import {Loader, Dimmer, Message, Form, Button, Dropdown} from 'semantic-ui-react';
 import ZatannaInstance from '../ethereum/Zatanna';
+import {genreOptions} from '../utils';
 
 class RegisterUser extends Component {
   state = {
@@ -8,17 +9,17 @@ class RegisterUser extends Component {
     loading:false,
     errorMessage:'',
     msg:'',
-    userName:'',
+    likedGenre:[],
   }
 
   onSubmit = async event => {
+    console.log(this.state.likedGenre);
     event.preventDefault();
-
     this.setState({errorMessage:'', loading:true, msg:''});
 
     try{
       if (this.props.role === '0'){
-        await ZatannaInstance.methods.userRegister(this.state.userName).send({from:this.props.account});
+        await ZatannaInstance.methods.userRegister(this.state.likedGenre).send({from:this.props.account});
         this.setState({msg:"You've Successfully registered as a User"});
       }else{
         if (this.props.role === '1') {this.setState({errorMessage:"You've already registered as an Artist"});}
@@ -30,6 +31,16 @@ class RegisterUser extends Component {
     }
 
     this.setState({loading:false});
+  }
+
+  handleGenre = (k,{value}) => {
+    this.setState({msg:''});
+
+    if (value.length >= 3){
+      value = value.slice(0,3);
+      this.setState({msg:"Thanks for choosing 3 genres!"});
+    }
+    this.setState({likedGenre:value});
   }
 
   render() {
@@ -53,8 +64,8 @@ class RegisterUser extends Component {
       <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
         <Form.Group>
           <Form.Field width={12}>
-            <label>Enter Your Name</label>
-            <Input value={this.state.value} onChange={event => this.setState({userName:event.target.value})} />
+            <label>Choose 3 genres that you like:</label><br/>
+            <Dropdown placeholder='Choose Genre' value={this.state.likedGenre} options={genreOptions} search multiple selection onChange={this.handleGenre} />
           </Form.Field>
           <Button primary basic floated='right' loading={this.state.loading} disabled={this.state.loading}>
             Register

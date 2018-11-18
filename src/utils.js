@@ -22,3 +22,21 @@ export function awsSigning(reqParam, path) {
 		
 	return signedRequest;
 };
+
+export const genreOptions = [
+  {key:'country',text:'Country',value:1},
+  {key:'classical',text:'Classical',value:2},
+  {key:'electronic',text:'Electronic',value:3},
+  {key:'hiphop',text:'Hip-Hop',value:4},
+  {key:'rap',text:'Rap',value:5},
+  {key:'jazz',text:'Jazz',value:6},
+  {key:'latin',text:'Latin',value:7},
+  {key:'opera',text:'Opera',value:8},
+  {key:'pop',text:'Pop',value:9},
+  {key:'rbsoul',text:'R&B/Soul',value:10},
+  {key:'reggae',text:'Reggae',value:11},
+  {key:'rock',text:'Rock',value:12},
+  {key:'metal',text:'Metal',value:13},
+  {key:'blues',text:'Blues',value:14},
+  {key:'dance',text:'Dance',value:15}
+]

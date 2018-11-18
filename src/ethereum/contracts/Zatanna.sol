@@ -10,7 +10,7 @@ contract Zatanna{
  
     struct User{
         uint uID;
-        string uName;
+        uint[] likedGenres;
         uint[] purchasedSongs;
     }
  
@@ -22,12 +22,12 @@ contract Zatanna{
     }
  
     struct Song{
-        uint artistId;
-        uint cost;
+        uint aID;
         uint sID;
+        uint cost;
+        uint genre;
         uint releaseDate;
         string name;
-        string genre;
     }
  
     enum ROLE {UNREGISTERED, ARTIST, USER}                                      // Keep track of type of user
@@ -55,12 +55,12 @@ contract Zatanna{
         return hashToSong[_hash].sID;
     }
      
-    function userRegister(string _uName) external{
+    function userRegister(uint[] _likedGenres) external{
         require(userId[msg.sender].uID == 0, 'Already registered!');
         
         lastUser += 1;
         
-        User memory newUser = User(lastUser,_uName, new uint[](0));
+        User memory newUser = User(lastUser,_likedGenres, new uint[](0));
         userId[msg.sender] = newUser;
         role[msg.sender] = ROLE.USER;                                           // Update role
     }
@@ -79,7 +79,7 @@ contract Zatanna{
      
      
     // Add Song details and update Artist's details
-    function artistUploadSong(uint _cost, string _name, string _genre, string songHash) external{
+    function artistUploadSong(uint _cost, string _name, uint _genre, string songHash) external{
         require(role[msg.sender] == ROLE.ARTIST, 'Not an artist');              // Only people registered as artists can upload
         require(artistId[msg.sender] != 0, 'Not a registered Artist');          // Has to be a registered artist
         require(hashToSong[songHash].sID == 0, "Can't upload duplicate");        // Has to be a unique song
@@ -90,7 +90,7 @@ contract Zatanna{
         artistInstance.songsUploaded.push(lastSong);                            // Update Artist instance
     
         // Map SongID to Song
-        idToSong[lastSong] = Song(artistInstance.aID, _cost, lastSong, now, _name, _genre);
+        idToSong[lastSong] = Song(artistInstance.aID, lastSong, _cost, _genre, now, _name);
         hashToSong[songHash] = idToSong[lastSong];                              // Update hashToSong dictionary
     }
      
@@ -101,14 +101,14 @@ contract Zatanna{
         require(msg.value == idToSong[songID].cost);                            // Check if song cost is paid
         
         userId[msg.sender].purchasedSongs.push(songID);
-        uint artistID = idToSong[songID].artistId;
+        uint artistID = idToSong[songID].aID;
     
         idToArtist[artistID].artistAddress.transfer(msg.value);                 // Transfer money to artist
     }
      
     // Returns user profile
-    function userDetail() view external returns(uint, string, uint[]){
-        return (userId[msg.sender].uID, userId[msg.sender].uName, userId[msg.sender].purchasedSongs);
+    function userDetail() view external returns(uint, uint[], uint[]){
+        return (userId[msg.sender].uID, userId[msg.sender].likedGenres, userId[msg.sender].purchasedSongs);
     }
      
     // When user checks Artist's profile
@@ -117,9 +117,9 @@ contract Zatanna{
     }
      
     // Returns song details
-    function songDetail(uint _songId) view external returns(uint artistID, uint id, string name, uint cost, uint releaseDate, string genre){
+    function songDetail(uint _songId) view external returns(uint artistID, uint id, string name, uint cost, uint releaseDate, uint genre){
         id = idToSong[_songId].sID;
-        artistID = idToSong[_songId].artistId;
+        artistID = idToSong[_songId].aID;
         name = idToSong[_songId].name;
         cost = idToSong[_songId].cost;
         releaseDate = idToSong[_songId].releaseDate;

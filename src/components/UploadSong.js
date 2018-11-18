@@ -6,25 +6,7 @@ import axios from 'axios';
 import configuration from '../config';
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
-import {awsSigning} from '../utils.js'
-
-const genreOptions = [
-  {key:'country',text:'Country',value:'country'},
-  {key:'classical',text:'Classical',value:'classical'},
-  {key:'blues',text:'Blues',value:'blues'},
-  {key:'dance',text:'Dance',value:'dance'},
-  {key:'electronic',text:'Electronic',value:'electronic'},
-  {key:'hiphop',text:'Hip-Hop',value:'hiphop'},
-  {key:'rap',text:'Rap',value:'rap'},
-  {key:'jazz',text:'Jazz',value:'jazz'},
-  {key:'latin',text:'Latin',value:'latin'},
-  {key:'opera',text:'Opera',value:'opera'},
-  {key:'pop',text:'Pop',value:'pop'},
-  {key:'rbsoul',text:'R&B/Soul',value:'rbsoul'},
-  {key:'reggae',text:'Reggae',value:'reggae'},
-  {key:'rock',text:'Rock',value:'rock'},
-  {key:'metal',text:'Metal',value:'metal'}
-]
+import {awsSigning, genreOptions} from '../utils.js';
 
 var Buffer = require('buffer/').Buffer
 class UploadSong extends Component {
@@ -108,7 +90,6 @@ class UploadSong extends Component {
   }
 
   onSubmit = async (event) => {
-    console.log(this.state.genre);
     event.preventDefault();
 
     this.setState({errorMessage:'', loading:true, msg:''});
@@ -129,7 +110,7 @@ class UploadSong extends Component {
       }
 
       try{
-        await ZatannaInstance.methods.artistUploadSong(this.state.cost,this.state.name, this.state.genre, this.state.songHash).send({from:this.state.userAccount});
+        await ZatannaInstance.methods.artistUploadSong(this.state.cost,this.state.name, parseInt(this.state.genre,10), this.state.songHash).send({from:this.state.userAccount});
         this.setState({msg:"Song Uploaded Successfully!"});
       }catch(err){
         // If error, delete the uploaded song from S3!
