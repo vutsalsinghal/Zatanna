@@ -58,7 +58,7 @@ class SongList extends Component {
         var formattedDate = day + '-' + month.substr(-2) + '-' + year;
 
         return (
-          <Card key={id} href={'/Zatanna/songs/detail/'+song[0]}>
+          <Card key={id} href={'/songs/detail/'+song[0]}>
             <Card.Content>
               <Card.Header>{song[1].split('.')[0]}</Card.Header>
               <Card.Meta>
