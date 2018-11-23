@@ -97,7 +97,7 @@ class Home extends Component {
                 <br /><br />
                 <h3>Welcome Back</h3>
                 <br />
-                <Link to='/Zatanna/uploadSong'>
+                <Link to='/uploadSong'>
                   <Button basic icon labelPosition='left' className="primary">
                     <Icon name='upload' />
                     Upload Song
@@ -117,13 +117,13 @@ class Home extends Component {
                 <br /><br />
                 <h3>Welcome Back</h3>
                 <br />
-                <Link to='/Zatanna/songs'>
+                <Link to='/songs'>
                   <Button basic icon labelPosition='right' className="primary">
                     <Icon name='play circle outline' />
                     Discover Songs
                   </Button>
                 </Link>
-                <Link to='/Zatanna/mySongs'>
+                <Link to='/mySongs'>
                   <Button basic icon labelPosition='left' className="primary">
                     <Icon name='cart arrow down' />
                     My Songs

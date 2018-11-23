@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-// Deployed at 0xc0f06264f21b283f2c8d8eb411fe768fe236f8dc on Rinkeby
+// Deployed at 0x2e1112adc3c8ccad1593dbae3dd2251a77604fe8 on Rinkeby
 
 contract Zatanna{
     address public owner;
@@ -15,9 +15,9 @@ contract Zatanna{
     }
  
     struct Artist{
+        uint aID;
         string name;
         address artistAddress;
-        uint aID;
         uint[] songsUploaded;
     }
  
@@ -70,7 +70,7 @@ contract Zatanna{
         require(artistId[msg.sender] == 0, 'Already registered!');
         lastArtist += 1;
         
-        Artist memory newArtist = Artist(_name, msg.sender, lastArtist, new uint[](0));
+        Artist memory newArtist = Artist(lastArtist, _name, msg.sender, new uint[](0));
         
         artistId[msg.sender] = lastArtist;
         idToArtist[lastArtist] = newArtist;
@@ -114,6 +114,11 @@ contract Zatanna{
     // When user checks Artist's profile
     function artistDetail(uint _artistID) view external returns(string , uint[] ){
         return (idToArtist[_artistID].name, idToArtist[_artistID].songsUploaded);
+    }
+
+    function getSongRdsDetails(address _address) view external returns(uint, uint, uint){
+        uint sReleaseDate = idToSong[lastSong].releaseDate;
+        return (artistId[_address], lastSong, sReleaseDate);
     }
      
     // Returns song details

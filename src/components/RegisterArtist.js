@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import {Loader, Dimmer, Message, Form, Input, Button} from 'semantic-ui-react';
+import axios from 'axios';
 import web3 from '../ethereum/web3';
+import {awsSigning} from '../utils.js';
 import ZatannaInstance from '../ethereum/Zatanna';
 
 class RegisterArtist extends Component {
@@ -21,6 +23,22 @@ class RegisterArtist extends Component {
       if (this.props.role === '0'){
         await ZatannaInstance.methods.artistRegister(this.state.artistName).send({from:this.props.account, value: web3.utils.toWei('0.05','ether')});
         this.setState({msg:"You've Successfully registered as an Artist"});
+
+        let lastArtist = await ZatannaInstance.methods.lastArtist().call({from:this.props.account});
+        let request = {
+          'action':"addArtist",
+          'aID':lastArtist,
+          'aName':this.state.artistName,
+          'aAddress':this.props.account
+        }
+
+        let signedRequest = awsSigning(request,'v1/rdsaction');
+        try{
+          axios(signedRequest);
+        }catch(e){
+          console.log(e);
+        }
+
       }else{
         if (this.props.role === '1') {this.setState({errorMessage:"You've already registered as an Artist"});}
         else {this.setState({errorMessage:"You've already registered as a User"});}

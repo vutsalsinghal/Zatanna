@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import {Loader, Dimmer, Message, Form, Button, Dropdown} from 'semantic-ui-react';
+import {Loader, Dimmer, Message, Form, Button, Dropdown, Input} from 'semantic-ui-react';
+import axios from 'axios';
+import {awsSigning, genreOptions} from '../utils.js';
 import ZatannaInstance from '../ethereum/Zatanna';
-import {genreOptions} from '../utils';
 
 class RegisterUser extends Component {
   state = {
@@ -9,18 +10,40 @@ class RegisterUser extends Component {
     loading:false,
     errorMessage:'',
     msg:'',
+    name:'',
     likedGenre:[],
   }
 
   onSubmit = async event => {
-    console.log(this.state.likedGenre);
     event.preventDefault();
     this.setState({errorMessage:'', loading:true, msg:''});
 
     try{
       if (this.props.role === '0'){
-        await ZatannaInstance.methods.userRegister(this.state.likedGenre).send({from:this.props.account});
-        this.setState({msg:"You've Successfully registered as a User"});
+        if (this.state.name !== '' && this.state.likedGenre !== []){
+          if (this.state.likedGenre.length < 3){
+            this.setState({errorMessage:"Choose exactly 3 genres"});
+          }else{
+            await ZatannaInstance.methods.userRegister(this.state.likedGenre).send({from:this.props.account});
+            
+            let lastUser = await ZatannaInstance.methods.lastUser().call({from:this.props.account});
+            let request = {
+              'action':"addUser",
+              'uID':lastUser,
+              'uName':this.state.name
+            }
+
+            let signedRequest = awsSigning(request,'v1/rdsaction');
+
+            try{
+              axios(signedRequest);
+            }catch(e){
+              console.log(e);
+            }
+
+            this.setState({msg:"You've Successfully registered as a User"});
+          }
+        }else{this.setState({errorMessage:"Fill all values!"});}
       }else{
         if (this.props.role === '1') {this.setState({errorMessage:"You've already registered as an Artist"});}
         else {this.setState({errorMessage:"You've already registered as a User"});}
@@ -38,7 +61,7 @@ class RegisterUser extends Component {
 
     if (value.length >= 3){
       value = value.slice(0,3);
-      this.setState({msg:"Thanks for choosing 3 genres!"});
+      //this.setState({msg:"Thanks for choosing 3 genres!"});
     }
     this.setState({likedGenre:value});
   }
@@ -62,6 +85,10 @@ class RegisterUser extends Component {
 
     return (
       <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
+        <Form.Field width={12}>
+          <label>Name</label>
+          <Input onChange={event => this.setState({name: event.target.value})} />
+        </Form.Field>
         <Form.Group>
           <Form.Field width={12}>
             <label>Choose 3 genres that you like:</label><br/>

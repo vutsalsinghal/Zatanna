@@ -11,17 +11,17 @@ import {awsSigning, genreOptions} from '../utils.js';
 var Buffer = require('buffer/').Buffer
 class UploadSong extends Component {
   state = {
-  name:'',
-  cost:'',
-  genre:'',
-  role:'',
-  songHash:'',
-  actualSong:'',
-  userAccount:'',
-  loadingData:false,
-  loading:false,
-  errorMessage:'',
-  msg:'',
+    name:'',
+    cost:'',
+    genre:'',
+    role:'',
+    songHash:'',
+    actualSong:'',
+    userAccount:'',
+    loadingData:false,
+    loading:false,
+    errorMessage:'',
+    msg:'',
   }
 
   async componentDidMount(){
@@ -32,45 +32,44 @@ class UploadSong extends Component {
       const accounts = await web3.eth.getAccounts();
       const role = await ZatannaInstance.methods.getRole().call({from:accounts[0]});
       this.setState({role:role, userAccount:accounts[0]});
-
     }catch(err){
       console.log(err);
     }
 
     this.setState({loadingData:false});
-    }
+  }
 
-    fileCapture = (file) => {
+  fileCapture = (file) => {
     this.setState({errorMessage:'', loading:true, msg:'', name:file.name});
 
     if (typeof file !== 'undefined'){
       if (file.type.split('/')[0] === 'audio'){
-      try{
-        let reader = new window.FileReader()
-        reader.readAsArrayBuffer(file)
-        reader.onloadend = async () => {
-          const buffer = Buffer.from(reader.result);
-          var spark = new SparkMD5.ArrayBuffer();
-          spark.append(buffer);
-          let hash = spark.end();
-          this.setState({songHash:hash.toString()});
-        }
+        try{
+          let reader = new window.FileReader()
+          reader.readAsArrayBuffer(file)
+          reader.onloadend = async () => {
+            const buffer = Buffer.from(reader.result);
+            var spark = new SparkMD5.ArrayBuffer();
+            spark.append(buffer);
+            let hash = spark.end();
+            this.setState({songHash:hash.toString()});
+          }
 
-        const tmr = setInterval(() => {
-        if (this.state.songHash === '') {
-          // pass
-        }else{
-          clearInterval(tmr);
-          this.checkUnique(file);
-        }
-        }, 1000);
+          const tmr = setInterval(() => {
+          if (this.state.songHash === '') {
+            // pass
+          }else{
+            clearInterval(tmr);
+            this.checkUnique(file);
+          }
+          }, 1000);
 
-      }catch(err){
-        console.log("error: ",err.message);
-      }
+        }catch(err){
+          console.log("error: ",err.message);
+        }
       }else{
-      this.setState({errorMessage:'Not a audio file!'});
-      this.setState({loading:false});
+        this.setState({errorMessage:'Not a audio file!'});
+        this.setState({loading:false});
       }
     }else{
       this.setState({errorMessage:'No file selected!'});
@@ -112,6 +111,24 @@ class UploadSong extends Component {
       try{
         await ZatannaInstance.methods.artistUploadSong(this.state.cost,this.state.name, parseInt(this.state.genre,10), this.state.songHash).send({from:this.state.userAccount});
         this.setState({msg:"Song Uploaded Successfully!"});
+
+        let rdsDetails = await ZatannaInstance.methods.getSongRdsDetails(this.state.userAccount).call({from:this.state.userAccount});
+        let request = {
+          'action':"addSong",
+          'sID':rdsDetails[1],
+          'aID':rdsDetails[0],
+          'sName':this.state.name,
+          'sCost':this.state.cost.toString(),
+          'sGenre':this.state.genre,
+          'sReleaseDate':rdsDetails[2].toString()
+        }
+
+        let signedRequest = awsSigning(request,'v1/rdsaction');
+        try{
+          axios(signedRequest);
+        }catch(e){
+          console.log(e);
+        }
       }catch(err){
         // If error, delete the uploaded song from S3!
 
