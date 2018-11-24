@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {Loader, Dimmer, Message, Form, Button, Dropdown, Input} from 'semantic-ui-react';
-import axios from 'axios';
 import {awsSigning, genreOptions} from '../utils.js';
 import ZatannaInstance from '../ethereum/Zatanna';
 
@@ -30,16 +29,12 @@ class RegisterUser extends Component {
             let request = {
               'action':"addUser",
               'uID':lastUser,
-              'uName':this.state.name
+              'uName':this.state.name,
+              'likedGenre':this.state.likedGenre
             }
 
-            let signedRequest = awsSigning(request,'v1/rdsaction');
-
-            try{
-              axios(signedRequest);
-            }catch(e){
-              console.log(e);
-            }
+            // Send request to AWS
+            awsSigning(request,'v1/rdsaction');
 
             this.setState({msg:"You've Successfully registered as a User"});
           }

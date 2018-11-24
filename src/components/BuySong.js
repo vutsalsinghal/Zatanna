@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {Loader, Dimmer, Message, Form, Button} from 'semantic-ui-react';
 import web3 from '../ethereum/web3';
+import {awsSigning} from '../utils.js';
 import ZatannaInstance from '../ethereum/Zatanna';
 
 class BuySong extends Component {
@@ -19,7 +20,17 @@ class BuySong extends Component {
     try{
       if (this.props.role === '2'){
         await ZatannaInstance.methods.userBuySong(this.props.songID).send({from:this.props.userAccount, value: this.props.songCost});
-        this.setState({msg:this.props.songName.split('.')[0]+" Successfully purchased!"});
+        this.setState({msg:this.props.songName.split('.').slice(0,-1).join('.')+" - Successfully purchased!"});
+
+        let userDetail = await ZatannaInstance.methods.userDetail().call({from:this.props.userAccount});
+        let dynamoRequest = {
+          'action':"SongPurchase",
+          'sID':this.props.songID,
+          'uID':userDetail[0],
+        }
+
+        // Send request to AWS
+        awsSigning(dynamoRequest,'v1/dynamoaction');
       }
     }catch(err){
       this.setState({errorMessage:err.message, msg:''});

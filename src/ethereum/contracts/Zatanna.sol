@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-// Deployed at 0x2e1112adc3c8ccad1593dbae3dd2251a77604fe8 on Rinkeby
+// Deployed at 0xffe91f1c910eb0693eb533c7ed6391c19dd6a174 on Rinkeby
 
 contract Zatanna{
     address public owner;
@@ -82,7 +82,7 @@ contract Zatanna{
     function artistUploadSong(uint _cost, string _name, uint _genre, string songHash) external{
         require(role[msg.sender] == ROLE.ARTIST, 'Not an artist');              // Only people registered as artists can upload
         require(artistId[msg.sender] != 0, 'Not a registered Artist');          // Has to be a registered artist
-        require(hashToSong[songHash].sID == 0, "Can't upload duplicate");        // Has to be a unique song
+        require(hashToSong[songHash].sID == 0, "Can't upload duplicate");       // Has to be a unique song
     
         lastSong += 1;
         

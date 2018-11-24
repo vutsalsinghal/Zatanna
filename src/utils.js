@@ -1,26 +1,27 @@
 import aws4 from 'aws4';
-import configuration from './config';
+import axios from 'axios';
 
-export function awsSigning(reqParam, path) {
-	let signedRequest = aws4.sign({
-  		host: 'h3d9g2pk5i.execute-api.us-east-2.amazonaws.com/',
-		method:'POST',
-		url:'https://h3d9g2pk5i.execute-api.us-east-2.amazonaws.com/' + path,
-		headers: {
-			'content-type': 'application/json',
-			'x-api-key':configuration.apiKey,
-		},
-		
-		secretAccessKey: configuration.accessKeyId,
-		accessKeyId: configuration.secretAccessKey,
-		data:reqParam,
-		body:reqParam
-	})
+export async function awsSigning(reqParam, path) {
+  let signedRequest = aws4.sign({
+      host: 'h3d9g2pk5i.execute-api.us-east-2.amazonaws.com/',
+    method:'POST',
+    url:'https://h3d9g2pk5i.execute-api.us-east-2.amazonaws.com/' + path,
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key':process.env.REACT_APP_apiKey,
+    },
+    
+    secretAccessKey: process.env.REACT_APP_accessKeyId,
+    accessKeyId: process.env.REACT_APP_secretAccessKey,
+    data:reqParam,
+    body:reqParam
+  })
 
-	delete signedRequest.headers['Host']
-	delete signedRequest.headers['Content-Length']
-		
-	return signedRequest;
+  delete signedRequest.headers['Host']
+  delete signedRequest.headers['Content-Length']
+  
+  let response = await axios(signedRequest);
+  return response;
 };
 
 export const genreOptions = [

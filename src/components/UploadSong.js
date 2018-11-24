@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import {Loader, Dimmer, Message, Form, Input, Button, Dropdown} from 'semantic-ui-react';
 import S3Client from 'aws-s3';
 import SparkMD5 from 'spark-md5';
-import axios from 'axios';
-import configuration from '../config';
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 import {awsSigning, genreOptions} from '../utils.js';
@@ -97,8 +95,8 @@ class UploadSong extends Component {
       const config = {
         bucketName: 'zatanna-music-upload',
         region: 'us-east-1',
-        accessKeyId: configuration.accessKeyId,
-        secretAccessKey: configuration.secretAccessKey,
+        accessKeyId: process.env.REACT_APP_accessKeyId,
+        secretAccessKey: process.env.REACT_APP_secretAccessKey,
         dirName: 'songs',
       }
       
@@ -113,7 +111,7 @@ class UploadSong extends Component {
         this.setState({msg:"Song Uploaded Successfully!"});
 
         let rdsDetails = await ZatannaInstance.methods.getSongRdsDetails(this.state.userAccount).call({from:this.state.userAccount});
-        let request = {
+        let rdsRequest = {
           'action':"addSong",
           'sID':rdsDetails[1],
           'aID':rdsDetails[0],
@@ -123,12 +121,16 @@ class UploadSong extends Component {
           'sReleaseDate':rdsDetails[2].toString()
         }
 
-        let signedRequest = awsSigning(request,'v1/rdsaction');
-        try{
-          axios(signedRequest);
-        }catch(e){
-          console.log(e);
+        let dynamoRequest = {
+          'action':"SongUpload",
+          'sID':rdsDetails[1],
+          'aID':rdsDetails[0],
         }
+
+        // Send request to AWS
+        awsSigning(rdsRequest,'v1/rdsaction');
+        awsSigning(dynamoRequest,'v1/dynamoaction');
+        
       }catch(err){
         // If error, delete the uploaded song from S3!
 
@@ -138,13 +140,7 @@ class UploadSong extends Component {
           'key':"songs/"+this.state.name
         }
 
-        let signedRequest = awsSigning(request,'v1/s3action');
-        try{
-          axios(signedRequest);
-        }catch(e){
-          console.log(e);
-        }
-
+        awsSigning(request,'v1/s3action');
         this.setState({errorMessage:err.message, msg:''});
       }
     }else{

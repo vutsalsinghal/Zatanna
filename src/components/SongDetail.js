@@ -4,9 +4,11 @@ import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 import Donate from './Donate';
 import BuySong from './BuySong';
+import {awsSigning} from '../utils.js';
 
 class SongDetail extends Component {
   state = {
+    purchased:false,
     artistID:'',
     artistName:'',
     id:'',
@@ -39,6 +41,20 @@ class SongDetail extends Component {
           // Get artist details
           let artistDets = await ZatannaInstance.methods.artistDetail(artistID).call({from:accounts[0]});
           this.setState({artistID, artistName:artistDets[0], id, name, cost, releaseDate, genere, s3Link});
+
+          let userDetail = await ZatannaInstance.methods.userDetail().call({from:accounts[0]});
+          let dynamoRequest = {
+            'retrieve':"SongPurchase",
+            'sID':this.state.id,
+            'uID':userDetail[0],
+          }
+
+          // Send request to AWS
+          let response = await awsSigning(dynamoRequest,'v1/dynamoaction');
+          if (response.data.body===true){
+            this.setState({purchased:true});
+          }
+
         }else{
           this.setState({errorMessage:'Song does not exists!'});
         }
@@ -113,18 +129,20 @@ class SongDetail extends Component {
                       </Modal.Content>
                     </Modal>
 
-                    <Modal size='small'
-                      trigger={
-                      <Button icon labelPosition='left' className="primary" floated="right" basic>
-                        <Icon name='heart outline' />
-                        Buy Song
-                      </Button>
-                      }>
-                      <Modal.Header>Buy This Song</Modal.Header>
-                      <Modal.Content>
-                        <BuySong role={this.state.role} userAccount={this.state.userAccount} songCost={this.state.cost} songID={this.state.id} songName={this.state.name} />
-                      </Modal.Content>
-                    </Modal>
+                    {!this.state.purchased &&
+                      <Modal size='small'
+                        trigger={
+                        <Button icon labelPosition='left' className="primary" floated="right" basic>
+                          <Icon name='heart outline' />
+                          Buy Song
+                        </Button>
+                        }>
+                        <Modal.Header>Buy This Song</Modal.Header>
+                        <Modal.Content>
+                          <BuySong role={this.state.role} userAccount={this.state.userAccount} songCost={this.state.cost} songID={this.state.id} songName={this.state.name} />
+                        </Modal.Content>
+                      </Modal>
+                    }
                   </Button.Group>
                 </Grid.Column>
               }
