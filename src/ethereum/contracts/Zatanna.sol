@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-// Deployed at 0xffe91f1c910eb0693eb533c7ed6391c19dd6a174 on Rinkeby
+// Deployed at 0x5fd1a646b0fc05a1cceac31bb6c0e4099a6f12e0 on Rinkeby
 
 contract Zatanna{
     address public owner;
@@ -17,6 +17,7 @@ contract Zatanna{
  
     struct Artist{
         uint aID;
+        uint uID;
         string name;
         address artistAddress;
         uint[] songsUploaded;
@@ -76,19 +77,19 @@ contract Zatanna{
         userId[msg.sender] = newUser;
     }
      
-    function artistRegister(string _name) external payable{
+    function artistRegister(string _name, uint[] _likedGenres) external payable{
         require(msg.value == 0.05 ether);
         require(artistId[msg.sender] == 0, 'Already registered!');
         lastArtist += 1;
         
-        Artist memory newArtist = Artist(lastArtist, _name, msg.sender, new uint[](0));
+        if (userId[msg.sender].uID == 0) {                                      // Every artist is also a user
+            userRegister(_likedGenres);
+        }
+        
+        Artist memory newArtist = Artist(lastArtist,userId[msg.sender].uID, _name, msg.sender, new uint[](0));
         
         artistId[msg.sender] = lastArtist;
         idToArtist[lastArtist] = newArtist;
-
-        if (userId[msg.sender].uID == 0) { // Every artist is also a user
-            userRegister(new uint[](0));
-        }
     }
      
      

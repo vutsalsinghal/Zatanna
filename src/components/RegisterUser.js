@@ -25,12 +25,11 @@ class RegisterUser extends Component {
           }else{
             await ZatannaInstance.methods.userRegister(this.state.likedGenre).send({from:this.props.account});
             
-            let lastUser = await ZatannaInstance.methods.lastUser().call({from:this.props.account});
+            let userDetail = await ZatannaInstance.methods.userDetail().call({from:this.props.account});
             let request = {
               'action':"addUser",
-              'uID':lastUser,
+              'uID':userDetail[0],
               'uName':this.state.name,
-              'likedGenre':this.state.likedGenre
             }
 
             // Send request to AWS
