@@ -12,6 +12,7 @@ contract Zatanna{
         uint uID;
         uint[] likedGenres;
         uint[] purchasedSongs;
+        mapping (uint => bool) songPurchased;
     }
  
     struct Artist{
@@ -37,8 +38,17 @@ contract Zatanna{
     mapping (address => User) userId;
     mapping (uint => Song) idToSong;
     mapping (string => Song) hashToSong;                                        // To keep track of unique uploads
-    mapping (address => ROLE) role;
-     
+
+    modifier onlyUser {
+        require(userId[msg.sender].uID != 0, 'Not a user');
+        _;
+    }
+
+    modifier onlyArtist {
+        require(artistId[msg.sender] != 0, 'Not an artist');
+        _;
+    }
+
     constructor() public{
         owner = msg.sender;
         lastSong = 0;
@@ -48,21 +58,22 @@ contract Zatanna{
  
     // Returns user type
     function getRole() view external returns(ROLE){
-        return role[msg.sender];
+        return ((artistId[msg.sender] != 0) ? ROLE.ARTIST:
+                (userId[msg.sender].uID != 0) ? ROLE.USER:
+                ROLE.UNREGISTERED);
     }
     
     function songIsUnique(string _hash) view external returns(uint){
         return hashToSong[_hash].sID;
     }
      
-    function userRegister(uint[] _likedGenres) external{
+    function userRegister(uint[] _likedGenres) public{
         require(userId[msg.sender].uID == 0, 'Already registered!');
         
         lastUser += 1;
         
         User memory newUser = User(lastUser,_likedGenres, new uint[](0));
         userId[msg.sender] = newUser;
-        role[msg.sender] = ROLE.USER;                                           // Update role
     }
      
     function artistRegister(string _name) external payable{
@@ -74,14 +85,15 @@ contract Zatanna{
         
         artistId[msg.sender] = lastArtist;
         idToArtist[lastArtist] = newArtist;
-        role[msg.sender] = ROLE.ARTIST;                                         // Update role
+
+        if (userId[msg.sender].uID == 0) { // Every artist is also a user
+            userRegister(new uint[](0));
+        }
     }
      
      
     // Add Song details and update Artist's details
-    function artistUploadSong(uint _cost, string _name, uint _genre, string songHash) external{
-        require(role[msg.sender] == ROLE.ARTIST, 'Not an artist');              // Only people registered as artists can upload
-        require(artistId[msg.sender] != 0, 'Not a registered Artist');          // Has to be a registered artist
+    function artistUploadSong(uint _cost, string _name, uint _genre, string songHash) onlyArtist external{
         require(hashToSong[songHash].sID == 0, "Can't upload duplicate");       // Has to be a unique song
     
         lastSong += 1;
@@ -95,15 +107,18 @@ contract Zatanna{
     }
      
     // When user buys song
-     function userBuySong(uint songID) payable external{
-        require(role[msg.sender] == ROLE.USER, 'Not a user');                   // Only people registered as USERS can purchase
-        require(idToSong[songID].sID != 0, 'Song does not exists!');
-        require(msg.value == idToSong[songID].cost);                            // Check if song cost is paid
+     function userBuySong(uint songID) onlyUser payable external{
+        Song storage song = idToSong[songID];
+        require(song.sID != 0, 'Song does not exist!');
+        require(msg.value == song.cost);                                        // Check if song cost is paid
+
+        User storage user = userId[msg.sender];
+        require(!user.songPurchased[songID]);                                   // Can't buy twice
         
-        userId[msg.sender].purchasedSongs.push(songID);
-        uint artistID = idToSong[songID].aID;
+        user.purchasedSongs.push(songID);
+        user.songPurchased[songID] = true;
     
-        idToArtist[artistID].artistAddress.transfer(msg.value);                 // Transfer money to artist
+        idToArtist[song.aID].artistAddress.transfer(msg.value);                 // Transfer money to artist
     }
      
     // Returns user profile
@@ -122,13 +137,14 @@ contract Zatanna{
     }
      
     // Returns song details
-    function songDetail(uint _songId) view external returns(uint artistID, uint id, string name, uint cost, uint releaseDate, uint genre){
-        id = idToSong[_songId].sID;
-        artistID = idToSong[_songId].aID;
-        name = idToSong[_songId].name;
-        cost = idToSong[_songId].cost;
-        releaseDate = idToSong[_songId].releaseDate;
-        genre = idToSong[_songId].genre;
+    function songDetail(uint songID) view external returns(uint artistID, uint id, string name, uint cost, uint releaseDate, uint genre){
+        Song storage song = idToSong[songID];        
+        id = song.sID;
+        artistID = song.aID;
+        name = song.name;
+        cost = song.cost;
+        releaseDate = song.releaseDate;
+        genre = song.genre;
     }
     
     function donate(uint artistID) public payable{
