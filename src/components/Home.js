@@ -98,9 +98,21 @@ class Home extends Component {
                 <h3>Welcome Back</h3>
                 <br />
                 <Link to='/uploadSong'>
-                  <Button basic icon labelPosition='left' className="primary">
+                  <Button icon labelPosition='left' className="primary">
                     <Icon name='upload' />
                     Upload Song
+                  </Button>
+                </Link><br/><br/>
+                <Link to='/songs'>
+                  <Button basic icon labelPosition='right' className="primary">
+                    <Icon name='play circle outline' />
+                    Discover Songs
+                  </Button>
+                </Link>
+                <Link to='/mySongs'>
+                  <Button basic icon labelPosition='left' className="primary">
+                    <Icon name='cart arrow down' />
+                    My Songs
                   </Button>
                 </Link>
               </Card.Content>

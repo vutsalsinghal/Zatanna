@@ -34,7 +34,7 @@ class SongDetail extends Component {
       const role = await ZatannaInstance.methods.getRole().call({from:accounts[0]});
       this.setState({role:role, userAccount:accounts[0]});
 
-      if (role === '2'){
+      if (role === '1' || role === '2'){
         let {artistID, id, name, cost, releaseDate, genere, s3Link} = await ZatannaInstance.methods.songDetail(this.props.match.params.id).call({from:accounts[0]});
         
         if (id !== '0'){  // i.e song exists!
@@ -105,7 +105,7 @@ class SongDetail extends Component {
 
     return (
       <div>
-        {this.state.role==='2' &&
+        {(this.state.role==='1' || this.state.role==='2') &&
           <div>
             <h2>Song Details:</h2>
             <Grid stackable>
@@ -150,8 +150,8 @@ class SongDetail extends Component {
           </div>
         }
 
-        {this.state.role!=='2' &&
-          <h2>You are not registered as an User!</h2>
+        {this.state.role==='0' &&
+          <h2>You are not registered!</h2>
         }
       </div>
     );

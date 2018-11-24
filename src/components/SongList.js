@@ -24,7 +24,7 @@ class SongList extends Component {
       const role = await ZatannaInstance.methods.getRole().call({from:accounts[0]});
       this.setState({role:role, userAccount:accounts[0]});
 
-      if (role === '2'){
+      if (role === '2' || role === '1'){
         let songList = [];
 
         const lastSong = await ZatannaInstance.methods.lastSong().call({from:accounts[0]});
@@ -93,15 +93,15 @@ class SongList extends Component {
 
     return (
       <div>
-        {this.state.role==='2' &&
+        {(this.state.role==='1' || this.state.role==='2') &&
           <div>  
             <h2>Discover The Expanse!</h2>
             {this.renderSongs()}
           </div>
         }
 
-        {this.state.role!=='2' &&
-          <h2>You are not registered as an User!</h2>
+        {this.state.role==='0' &&
+          <h2>You are not registered!</h2>
         }
       </div>
     );
