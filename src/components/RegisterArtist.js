@@ -16,8 +16,6 @@ class RegisterArtist extends Component {
 
   onSubmit = async event => {
     event.preventDefault();
-    console.log(this.state.likedGenre);
-
     this.setState({errorMessage:'', loading:true, msg:''});
 
     try{

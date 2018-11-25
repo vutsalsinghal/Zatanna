@@ -78,7 +78,7 @@ class SongDetail extends Component {
       return (
         <Card>
           <Card.Content>
-            <Card.Header>{this.state.name.split('.')[0]}</Card.Header>
+            <Card.Header>{this.state.name.split('.').slice(0,-1).join('.')}</Card.Header>
             <Card.Meta>
               <span>Cost: {web3.utils.fromWei(this.state.cost,'ether')} ETH</span>
             </Card.Meta>

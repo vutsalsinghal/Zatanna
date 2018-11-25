@@ -60,7 +60,7 @@ class SongList extends Component {
         return (
           <Card key={id} href={'/songs/detail/'+song[0]}>
             <Card.Content>
-              <Card.Header>{song[1].split('.')[0]}</Card.Header>
+              <Card.Header>{song[1].split('.').slice(0,-1).join('.')}</Card.Header>
               <Card.Meta>
                 <span>Cost: {web3.utils.fromWei(song[2],'ether')} ETH</span>
               </Card.Meta>
