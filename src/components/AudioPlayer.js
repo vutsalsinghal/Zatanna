@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import './AudioPlayer.css';
+import { awsSigning } from '../utils.js';
 
 class AudioPlayer extends PureComponent {
   static propTypes = {
@@ -12,18 +13,14 @@ class AudioPlayer extends PureComponent {
     onError: PropTypes.func,
     onPlay: PropTypes.func,
     onPause: PropTypes.func,
-    onPrevious: PropTypes.func,
-    onNext: PropTypes.func,
   };
 
   static defaultProps = {
-    onTimeUpdate: () => {},
-    onEnded: () => {},
-    onError: () => {},
-    onPlay: () => {},
-    onPause: () => {},
-    onPrevious: () => {},
-    onNext: () => {},
+    onTimeUpdate: () => { },
+    onEnded: () => { },
+    onError: () => { },
+    onPlay: () => { },
+    onPause: () => { }
   };
 
   constructor(props) {
@@ -36,8 +33,8 @@ class AudioPlayer extends PureComponent {
       progress: 0,
       random: false,
       playing: !!props.autoplay,
-      repeat: false,
       mute: false,
+      valueSet: false
     };
 
     this.audio = document.createElement('audio');
@@ -50,12 +47,10 @@ class AudioPlayer extends PureComponent {
     });
 
     this.audio.addEventListener('ended', e => {
-      this.next();
       props.onEnded(e);
     });
 
     this.audio.addEventListener('error', e => {
-      this.next();
       props.onError(e);
     });
   }
@@ -68,7 +63,6 @@ class AudioPlayer extends PureComponent {
       progress: 0,
       random: false,
       playing: !!nextProps.autoplay,
-      repeat: false,
       mute: false,
     });
   }
@@ -79,7 +73,7 @@ class AudioPlayer extends PureComponent {
     const { duration, currentTime } = this.audio;
     const progress = (currentTime * 100) / duration;
 
-    this.setState({progress: progress});
+    this.setState({ progress: progress });
   };
 
   setProgress = e => {
@@ -101,7 +95,7 @@ class AudioPlayer extends PureComponent {
   };
 
   play = () => {
-    this.setState({playing: true});
+    this.setState({ playing: true });
     this.audio.play();
     this.props.onPlay();
   };
@@ -112,46 +106,26 @@ class AudioPlayer extends PureComponent {
     });
 
     this.audio.pause();
-
     this.props.onPause();
   };
 
-  toggle = () => this.state.playing ? this.pause() : this.play();
+  toggle = () => {
+    if (!this.state.playing && Object.keys(this.props.componentDetail).length !== 0 && !this.state.valueSet) {
+      this.sendRequest();
+      this.setState({ valueSet: true });
+    }
+    this.state.playing ? this.pause() : this.play();
+  }
 
-  next = () => {
-    const { repeat, current, songs } = this.state;
-    const total = songs.length;
-    const newSongToPlay = repeat ? current : current < total - 1 ? current + 1 : 0;
-    const active = songs[newSongToPlay];
-
-    this.setState({
-      current: newSongToPlay,
-      active: active,
-      progress: 0,
-      repeat: false,
-    });
-
-    this.audio.src = active.url;
-    this.play();
-    this.props.onNext();
-  };
-
-  previous = () => {
-    const { current, songs } = this.state;
-    const total = songs.length;
-    const newSongToPlay = current > 0 ? current - 1 : total - 1;
-    const active = songs[newSongToPlay];
-
-    this.setState({
-      current: newSongToPlay,
-      active: active,
-      progress: 0,
-    });
-
-    this.audio.src = active.url;
-    this.play();
-    this.props.onPrevious();
-  };
+  sendRequest = async () => {
+    let dynamoRequest = {
+      'action': "SongDistribution",
+      'sID': this.props.componentDetail.sID,
+      'uID': this.props.componentDetail.uID
+    }
+    // Send request to AWS
+    awsSigning(dynamoRequest, 'v1/dynamoaction');
+  }
 
   randomize = () => {
     const { random, songs } = this.state;
@@ -162,11 +136,6 @@ class AudioPlayer extends PureComponent {
       random: !random,
     });
   };
-
-  repeat = () =>
-    this.setState({
-      repeat: !this.state.repeat,
-    });
 
   toggleMute = () => {
     const { mute } = this.state;
@@ -182,7 +151,6 @@ class AudioPlayer extends PureComponent {
     const {
       active: currentSong,
       progress,
-      active,
       playing,
       mute,
     } = this.state;
@@ -199,34 +167,46 @@ class AudioPlayer extends PureComponent {
       'fa-volume-off': mute,
     });
 
-		return (
+    return (
       <div className="player-container">
         <div className="artist-info">
           <h2 className="artist-song-name">{currentSong.artist.song}</h2>
           <h3>Artist: <span className="artist-name">{currentSong.artist.name}</span></h3>
         </div>
 
-        <div className="player-progress-container" onClick={e => this.setProgress(e)}>
-          <span className="player-progress-value" style={{width: progress + '%'}}></span>
-        </div>
+        {!this.props.quotaOver &&
+          <div>
+            <div className="player-progress-container" onClick={e => this.setProgress(e)}>
+              <span className="player-progress-value" style={{ width: progress + '%' }}></span>
+            </div>
 
-        <div className="player-options">
-          <div className="player-buttons player-controls">
-            <button onClick={this.toggle} className="player-btn medium" title="Play/Pause">
-              <i className={playPauseClass}></i>
-            </button>
-          </div>
+            <div className="player-options">
+              <div className="player-buttons player-controls">
+                <button onClick={this.toggle} className="player-btn medium" title="Play/Pause">
+                  <i className={playPauseClass}></i>
+                </button>
+              </div>
 
-          <div className="player-buttons">
-            <button className="player-btn small volume" onClick={this.toggleMute} title="Mute/Unmute">
-              <i className={volumeClass}></i>
-            </button>
+              <div className="player-buttons">
+                <button className="player-btn small volume" onClick={this.toggleMute} title="Mute/Unmute">
+                  <i className={volumeClass}></i>
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        }
+
+        {this.props.quotaOver &&
+          <div>
+            <p style={{ color: "#cc0000" }}>Quota Over</p>
+            You gotta purchase to keep the magic goin!
+            <br /><br />
+          </div>
+        }
 
       </div>
     );
-	}
+  }
 }
 
 export default AudioPlayer;

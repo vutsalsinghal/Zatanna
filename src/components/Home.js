@@ -1,40 +1,40 @@
 import React, { Component } from 'react';
-import {Grid, Loader, Dimmer, Button, Modal, Icon, Card} from 'semantic-ui-react';
-import {Link} from 'react-router-dom';
+import { Grid, Loader, Dimmer, Button, Modal, Icon, Card } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 import RegisterUser from './RegisterUser';
 import RegisterArtist from './RegisterArtist';
 
 class Home extends Component {
-    state = {
-    loadingData:false,
-    role:'',
-    account:'',
+  state = {
+    loadingData: false,
+    role: '',
+    account: '',
   }
 
-  async componentDidMount(){
-    this.setState({loadingData:true});
+  async componentDidMount() {
+    this.setState({ loadingData: true });
     document.title = "Zatanna";
 
-    try{
+    try {
       const accounts = await web3.eth.getAccounts();
-      const role = await ZatannaInstance.methods.getRole().call({from:accounts[0]});
-      this.setState({role, account:accounts[0]});
-    }catch(err){
+      const role = await ZatannaInstance.methods.getRole().call({ from: accounts[0] });
+      this.setState({ role, account: accounts[0] });
+    } catch (err) {
       console.log(err);
     }
 
-    this.setState({loadingData:false});
+    this.setState({ loadingData: false });
   }
 
 
 
   render() {
-    if(this.state.loadingData){
+    if (this.state.loadingData) {
       return (
         <Dimmer active inverted>
-        <Loader size='massive'>Loading...</Loader>
+          <Loader size='massive'>Loading...</Loader>
         </Dimmer>
       );
     }
@@ -42,7 +42,7 @@ class Home extends Component {
     return (
       <div>
         <h1></h1>
-        {this.state.role==='0' &&
+        {this.state.role === '0' &&
           <Grid stackable centered>
             <Card fluid color='green'>
               <Card.Content>
@@ -55,9 +55,9 @@ class Home extends Component {
                   <Button.Group>
                     <Modal size='small'
                       trigger={
-                      <Button icon labelPosition='left' className="primary" floated="right">
-                        <Icon name='users' />
-                        User
+                        <Button icon labelPosition='left' className="primary" floated="right">
+                          <Icon name='users' />
+                          User
                       </Button>
                       }>
                       <Modal.Header>Register as a User to Discover Music</Modal.Header>
@@ -67,12 +67,12 @@ class Home extends Component {
                     </Modal>
 
                     <Button.Or />
-                    
+
                     <Modal size='small'
                       trigger={
                         <Button icon labelPosition='right' className="primary" floated="right">
-                        <Icon name='user' />
-                        Artist
+                          <Icon name='user' />
+                          Artist
                         </Button>
                       }>
                       <Modal.Header>Register as an Artist</Modal.Header>
@@ -88,7 +88,7 @@ class Home extends Component {
           </Grid>
         }
 
-        {this.state.role==='1' &&
+        {this.state.role === '1' &&
           <Grid stackable centered>
             <Card fluid color='green'>
               <Card.Content>
@@ -102,7 +102,7 @@ class Home extends Component {
                     <Icon name='upload' />
                     Upload Song
                   </Button>
-                </Link><br/><br/>
+                </Link><br /><br />
                 <Link to='/songs'>
                   <Button basic icon labelPosition='right' className="primary">
                     <Icon name='play circle outline' />
@@ -120,7 +120,7 @@ class Home extends Component {
           </Grid>
         }
 
-        {this.state.role==='2' &&
+        {this.state.role === '2' &&
           <Grid stackable centered>
             <Card fluid color='green'>
               <Card.Content>

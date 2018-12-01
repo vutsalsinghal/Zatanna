@@ -41,12 +41,12 @@ contract Zatanna{
     mapping (string => Song) hashToSong;                                        // To keep track of unique uploads
 
     modifier onlyUser {
-        require(userId[msg.sender].uID != 0, 'Not a user');
+        require(userId[msg.sender].uID != 0, "Not a user");
         _;
     }
 
     modifier onlyArtist {
-        require(artistId[msg.sender] != 0, 'Not an artist');
+        require(artistId[msg.sender] != 0, "Not an artist");
         _;
     }
 
@@ -58,18 +58,16 @@ contract Zatanna{
     }
  
     // Returns user type
-    function getRole() view external returns(ROLE){
-        return ((artistId[msg.sender] != 0) ? ROLE.ARTIST:
-                (userId[msg.sender].uID != 0) ? ROLE.USER:
-                ROLE.UNREGISTERED);
+    function getRole() external view returns(ROLE){
+        return ((artistId[msg.sender] != 0) ? ROLE.ARTIST: (userId[msg.sender].uID != 0) ? ROLE.USER: ROLE.UNREGISTERED);
     }
     
-    function songIsUnique(string _hash) view external returns(uint){
+    function songIsUnique(string _hash) external view returns(uint){
         return hashToSong[_hash].sID;
     }
      
     function userRegister(uint[] _likedGenres) public{
-        require(userId[msg.sender].uID == 0, 'Already registered!');
+        require(userId[msg.sender].uID == 0, "Already registered!");
         
         lastUser += 1;
         
@@ -78,8 +76,8 @@ contract Zatanna{
     }
      
     function artistRegister(string _name, uint[] _likedGenres) external payable{
-        require(msg.value == 0.05 ether);
-        require(artistId[msg.sender] == 0, 'Already registered!');
+        require(msg.value == 0.05 ether,"Artist registration fee");
+        require(artistId[msg.sender] == 0, "Already registered!");
         lastArtist += 1;
         
         if (userId[msg.sender].uID == 0) {                                      // Every artist is also a user
@@ -94,7 +92,7 @@ contract Zatanna{
      
      
     // Add Song details and update Artist's details
-    function artistUploadSong(uint _cost, string _name, uint _genre, string songHash) onlyArtist external{
+    function artistUploadSong(uint _cost, string _name, uint _genre, string songHash) external onlyArtist{
         require(hashToSong[songHash].sID == 0, "Can't upload duplicate");       // Has to be a unique song
     
         lastSong += 1;
@@ -108,13 +106,13 @@ contract Zatanna{
     }
      
     // When user buys song
-     function userBuySong(uint songID) onlyUser payable external{
+    function userBuySong(uint songID) external onlyUser payable{
         Song storage song = idToSong[songID];
-        require(song.sID != 0, 'Song does not exist!');
-        require(msg.value == song.cost);                                        // Check if song cost is paid
+        require(song.sID != 0, "Song does not exist!");
+        require(msg.value == song.cost, "Check if song cost is paid");          // Check if song cost is paid
 
         User storage user = userId[msg.sender];
-        require(!user.songPurchased[songID]);                                   // Can't buy twice
+        require(!user.songPurchased[songID], "Can't buy twice");                // Can't buy twice
         
         user.purchasedSongs.push(songID);
         user.songPurchased[songID] = true;
@@ -123,22 +121,22 @@ contract Zatanna{
     }
      
     // Returns user profile
-    function userDetail() view external returns(uint, uint[], uint[]){
+    function userDetail() external view returns(uint, uint[], uint[]){
         return (userId[msg.sender].uID, userId[msg.sender].likedGenres, userId[msg.sender].purchasedSongs);
     }
      
     // When user checks Artist's profile
-    function artistDetail(uint _artistID) view external returns(string , uint[] ){
+    function artistDetail(uint _artistID) external view returns(string , uint[] ){
         return (idToArtist[_artistID].name, idToArtist[_artistID].songsUploaded);
     }
 
-    function getSongRdsDetails(address _address) view external returns(uint, uint, uint){
+    function getSongRdsDetails(address _address) external view returns(uint, uint, uint){
         uint sReleaseDate = idToSong[lastSong].releaseDate;
         return (artistId[_address], lastSong, sReleaseDate);
     }
      
     // Returns song details
-    function songDetail(uint songID) view external returns(uint artistID, uint id, string name, uint cost, uint releaseDate, uint genre){
+    function songDetail(uint songID) external view returns(uint artistID, uint id, string name, uint cost, uint releaseDate, uint genre){
         Song storage song = idToSong[songID];        
         id = song.sID;
         artistID = song.aID;
