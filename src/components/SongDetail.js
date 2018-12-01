@@ -21,7 +21,7 @@ class SongDetail extends Component {
     role: '',
     userAccount: '',
     componentDetail: {},
-    listenCount: '',
+    listenCount: 0,
     quotaOver: false,
     loadingData: false,
     loading: false,

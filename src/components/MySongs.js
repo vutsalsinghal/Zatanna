@@ -16,6 +16,7 @@ class mySongs extends Component {
     errorMessage: '',
     msg: '',
     playlist: '',
+    componentDetail: {},
   }
 
   async componentDidMount() {
@@ -69,7 +70,7 @@ class mySongs extends Component {
       var formattedDate = day + '-' + month.substr(-2) + '-' + year;
 
       return (
-        <Card key={id}>{/* href={'/songs/detail/'+song[1]}>*/}
+        <Card key={id}>
           <Card.Content>
             <AudioPlayer songs={[{
               url: song['url'],
@@ -78,7 +79,7 @@ class mySongs extends Component {
                 name: song['artist']['name'],
                 song: song['artist']['song']
               }
-            }]} />
+            }]} componentDetail={this.state.componentDetail} />
             <Card.Meta>Cost: {web3.utils.fromWei(song['cost'], 'ether')} ETH</Card.Meta>
             <Card.Description>Release Date: {formattedDate}</Card.Description>
           </Card.Content>
