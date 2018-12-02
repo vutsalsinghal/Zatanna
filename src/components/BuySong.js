@@ -19,7 +19,7 @@ class BuySong extends Component {
 
     try {
       if (this.props.role === '1' || this.props.role === '2') {
-        //await ZatannaInstance.methods.userBuySong(this.props.songID).send({ from: this.props.userAccount, value: this.props.songCost });
+        await ZatannaInstance.methods.userBuySong(this.props.songID).send({ from: this.props.userAccount, value: this.props.songCost });
         this.setState({ msg: this.props.songName.split('.').slice(0, -1).join('.') + " - Successfully purchased!" });
 
         let userDetail = await ZatannaInstance.methods.userDetail().call({ from: this.props.userAccount });
