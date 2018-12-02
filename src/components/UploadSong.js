@@ -111,6 +111,8 @@ class UploadSong extends Component {
         this.setState({ msg: "Song Uploaded Successfully!" });
 
         let rdsDetails = await ZatannaInstance.methods.getSongRdsDetails(this.state.userAccount).call({ from: this.state.userAccount });
+
+        // Send request to AWS
         let rdsRequest = {
           'action': "addSong",
           'sID': rdsDetails[1],
@@ -121,16 +123,7 @@ class UploadSong extends Component {
           'sReleaseDate': rdsDetails[2].toString()
         }
 
-        let dynamoRequest = {
-          'action': "SongUpload",
-          'sID': rdsDetails[1],
-          'aID': rdsDetails[0],
-        }
-
-        // Send request to AWS
         awsSigning(rdsRequest, 'v1/rdsaction');
-        awsSigning(dynamoRequest, 'v1/dynamoaction');
-
       } catch (err) {
         // If error, delete the uploaded song from S3!
 

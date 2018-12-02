@@ -121,7 +121,8 @@ class AudioPlayer extends PureComponent {
     let dynamoRequest = {
       'action': "SongDistribution",
       'sID': this.props.componentDetail.sID,
-      'uID': this.props.componentDetail.uID
+      'uID': this.props.componentDetail.uID,
+      'genre': this.props.componentDetail.genre
     }
     // Send request to AWS
     awsSigning(dynamoRequest, 'v1/dynamoaction');

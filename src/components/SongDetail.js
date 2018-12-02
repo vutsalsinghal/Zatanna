@@ -17,7 +17,7 @@ class SongDetail extends Component {
     name: '',
     cost: '',
     releaseDate: '',
-    genere: '',
+    genre: '',
     role: '',
     userAccount: '',
     componentDetail: {},
@@ -39,26 +39,26 @@ class SongDetail extends Component {
       this.setState({ role: role, userAccount: accounts[0] });
 
       if (role === '1' || role === '2') {
-        let { artistID, id, name, cost, releaseDate, genere } = await ZatannaInstance.methods.songDetail(this.props.match.params.id).call({ from: accounts[0] });
+        let { artistID, id, name, cost, releaseDate, genre } = await ZatannaInstance.methods.songDetail(this.props.match.params.id).call({ from: accounts[0] });
 
         if (id !== '0') {  // i.e song exists!
           // Get artist details
           let artistDets = await ZatannaInstance.methods.artistDetail(artistID).call({ from: accounts[0] });
-          this.setState({ artistID, artistName: artistDets[0], id, name, cost, releaseDate, genere });
-
           let userDetail = await ZatannaInstance.methods.userDetail().call({ from: accounts[0] });
+
+          this.setState({ artistID, artistName: artistDets[0], id, name, cost, releaseDate, genre, componentDetail: { "name": "SongDetail", "sID": id, "uID": userDetail[0], "genre": genre } });
+
+          // Send request to AWS
           let purchaseRequest = {
             'retrieve': "SongPurchase",
             'sID': id,
             'uID': userDetail[0],
+            'genre': genre
           }
-          // Send request to AWS
           let response1 = await awsSigning(purchaseRequest, 'v1/dynamoaction');
           if (response1.data.body === true) {
             this.setState({ purchased: true });
           }
-
-          this.setState({ componentDetail: { "name": "SongDetail", "sID": id, "uID": userDetail[0] } });
 
           let distributionRequest = {
             'retrieve': "SongDistribution",
@@ -67,7 +67,7 @@ class SongDetail extends Component {
           }
           let response2 = await awsSigning(distributionRequest, 'v1/dynamoaction');
           if (response2.data.body) {
-            const listenCount = parseInt(response2.data.body, 10);
+            const listenCount = parseInt(response2.data.body[0], 10);
             this.setState({ listenCount });
             if (listenCount > 5 && !this.state.purchased) {                                        // Listen Count (default: 5)
               this.setState({ quotaOver: true });
@@ -171,7 +171,7 @@ class SongDetail extends Component {
                         }>
                         <Modal.Header>Buy This Song</Modal.Header>
                         <Modal.Content>
-                          <BuySong role={this.state.role} userAccount={this.state.userAccount} songCost={this.state.cost} songID={this.state.id} songName={this.state.name} />
+                          <BuySong role={this.state.role} userAccount={this.state.userAccount} songCost={this.state.cost} songID={this.state.id} songName={this.state.name} genre={this.state.genre} />
                         </Modal.Content>
                       </Modal>
                     }
