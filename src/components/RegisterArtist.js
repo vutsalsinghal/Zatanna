@@ -24,30 +24,34 @@ class RegisterArtist extends Component {
           if (this.state.likedGenre.length < 3) {
             this.setState({ errorMessage: "Choose exactly 3 genres" });
           } else {
-            await ZatannaInstance.methods.artistRegister(this.state.artistName, this.state.likedGenre).send({ from: this.props.account, value: web3.utils.toWei('0.05', 'ether') });
-            this.setState({ msg: "You've Successfully registered as an Artist" });
+            try {
+              await ZatannaInstance.methods.artistRegister(this.state.artistName, this.state.likedGenre).send({ from: this.props.account, value: web3.utils.toWei('0.05', 'ether') });
+              this.setState({ msg: "You've Successfully registered as an Artist" });
 
-            // Send request to AWS
-            let lastArtist = await ZatannaInstance.methods.lastArtist().call({ from: this.props.account });
-            let userDetail = await ZatannaInstance.methods.userDetail().call({ from: this.props.account });
-            let artistRequest = {
-              'action': "addArtist",
-              'aID': lastArtist,
-              'uID': userDetail[0],
-              'aName': this.state.artistName,
-              'aAddress': this.props.account
+              // Send request to AWS
+              let lastArtist = await ZatannaInstance.methods.lastArtist().call({ from: this.props.account });
+              let userDetail = await ZatannaInstance.methods.userDetail().call({ from: this.props.account });
+              let userRequest = {
+                'action': "addUser",
+                'uID': userDetail[0],
+                'uName': this.state.artistName,
+              }
+
+              // Send request to AWS
+              awsSigning(userRequest, 'v1/rdsaction');
+
+              let artistRequest = {
+                'action': "addArtist",
+                'aID': lastArtist,
+                'uID': userDetail[0],
+                'aName': this.state.artistName,
+                'aAddress': this.props.account
+              }
+
+              awsSigning(artistRequest, 'v1/rdsaction');
+            } catch (e) {
+              this.setState({ errorMessage: e.message });
             }
-
-            awsSigning(artistRequest, 'v1/rdsaction');
-
-            let userRequest = {
-              'action': "addUser",
-              'uID': userDetail[0],
-              'uName': this.state.artistName,
-            }
-
-            // Send request to AWS
-            awsSigning(userRequest, 'v1/rdsaction');
           }
         } else { this.setState({ errorMessage: "Fill all values!" }); }
       } else {

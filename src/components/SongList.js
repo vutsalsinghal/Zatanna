@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Loader, Dimmer, Card } from 'semantic-ui-react';
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
+import SearchSong from './SearchSong';
 
 class SongList extends Component {
   state = {
@@ -67,6 +68,7 @@ class SongList extends Component {
               <Card.Description>Release Date: {formattedDate}</Card.Description>
             </Card.Content>
           </Card>
+
         );
       });
     } else {
@@ -96,6 +98,8 @@ class SongList extends Component {
         {(this.state.role === '1' || this.state.role === '2') &&
           <div>
             <h2>Discover The Expanse!</h2>
+            <SearchSong />
+
             {this.renderSongs()}
           </div>
         }

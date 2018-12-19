@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import {BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './components/Home';
 import UploadSong from './components/UploadSong';
 import mySongs from './components/MySongs';
 import SongList from './components/SongList';
 import SongDetail from './components/SongDetail';
+import SearchResult from './components/SearchResult';
 
 class App extends Component {
   render() {
@@ -18,6 +19,7 @@ class App extends Component {
             <Route exact path="/mySongs" component={mySongs} />
             <Route exact path="/songs" component={SongList} />
             <Route exact path="/songs/detail/:id" component={SongDetail} />
+            <Route exact path="/searchSongs" component={SearchResult} />
           </Switch>
         </Layout>
       </BrowserRouter>
