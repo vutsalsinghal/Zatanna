@@ -11,6 +11,7 @@ class RegisterUser extends Component {
     msg: '',
     name: '',
     likedGenre: [],
+    open: false,
   }
 
   onSubmit = async event => {
@@ -24,16 +25,18 @@ class RegisterUser extends Component {
             this.setState({ errorMessage: "Choose exactly 3 genres" });
           } else {
             await ZatannaInstance.methods.userRegister(this.state.likedGenre).send({ from: this.props.account });
-
             let userDetail = await ZatannaInstance.methods.userDetail().call({ from: this.props.account });
-            let request = {
-              'action': "addUser",
-              'uID': userDetail[0],
-              'uName': this.state.name,
-            }
-
-            // Send request to AWS
-            awsSigning(request, 'v1/rdsaction');
+            console.log(userDetail);
+            setTimeout(() => {
+              let request = {
+                'action': "addUser",
+                'uID': userDetail[0],
+                'uName': this.state.name,
+              }
+              console.log(request);
+              // Send request to AWS
+              awsSigning(request, 'v1/rdsaction');
+            }, 1000);
 
             this.setState({ msg: "You've Successfully registered as a User" });
           }
@@ -52,10 +55,9 @@ class RegisterUser extends Component {
 
   handleGenre = (k, { value }) => {
     this.setState({ msg: '' });
-
     if (value.length >= 3) {
       value = value.slice(0, 3);
-      //this.setState({msg:"Thanks for choosing 3 genres!"});
+      this.setState({ open: false });
     }
     this.setState({ likedGenre: value });
   }
@@ -86,7 +88,7 @@ class RegisterUser extends Component {
         <Form.Group>
           <Form.Field width={12}>
             <label>Choose 3 genres that you like:</label><br />
-            <Dropdown placeholder='Choose Genre' value={this.state.likedGenre} options={genreOptions} search multiple selection onChange={this.handleGenre} />
+            <Dropdown placeholder='Choose Genre' open={this.state.open} onClick={() => this.setState({ open: !this.state.open })} value={this.state.likedGenre} options={genreOptions} search selection multiple onChange={this.handleGenre} />
           </Form.Field>
           <Button primary basic floated='right' loading={this.state.loading} disabled={this.state.loading}>
             Register

@@ -11,6 +11,7 @@ class Home extends Component {
     loadingData: false,
     role: '',
     account: '',
+    name: '',
   }
 
   async componentDidMount() {
@@ -48,7 +49,6 @@ class Home extends Component {
                 <Card.Header><h1>Hi There!</h1></Card.Header>
                 <br /><br />
                 <h3>Register as </h3>
-                <br />
                 <Card.Description>
                   <Button.Group>
                     <Modal size='small'
@@ -101,20 +101,23 @@ class Home extends Component {
                     Upload Song
                   </Button>
                 </Link><br /><br />
-                <Link to='/songs'>
-                  <Button basic icon labelPosition='right' className="primary">
-                    <Icon name='play circle outline' />
-                    Discover Songs
+                <Button.Group>
+                  <Link to='/songs'>
+                    <Button basic icon labelPosition='right' className="primary">
+                      <Icon name='play circle outline' />
+                      Discover Songs
                   </Button>
-                </Link>
-                <Link to='/mySongs'>
-                  <Button basic icon labelPosition='left' className="primary">
-                    <Icon name='cart arrow down' />
-                    My Songs
+                  </Link>
+                  <Link to='/mySongs'>
+                    <Button basic icon labelPosition='left' className="primary">
+                      <Icon name='cart arrow down' />
+                      My Songs
                   </Button>
-                </Link>
+                  </Link>
+                </Button.Group>
               </Card.Content>
             </Card>
+            <h3>Recommended Songs</h3>
           </Grid>
         }
 
@@ -127,18 +130,20 @@ class Home extends Component {
                 <br /><br />
                 <h3>Welcome Back</h3>
                 <br />
-                <Link to='/songs'>
-                  <Button basic icon labelPosition='right' className="primary">
-                    <Icon name='play circle outline' />
-                    Discover Songs
+                <Button.Group>
+                  <Link to='/songs'>
+                    <Button basic icon labelPosition='right' className="primary">
+                      <Icon name='play circle outline' />
+                      Discover Songs
                   </Button>
-                </Link>
-                <Link to='/mySongs'>
-                  <Button basic icon labelPosition='left' className="primary">
-                    <Icon name='cart arrow down' />
-                    My Songs
+                  </Link>
+                  <Link to='/mySongs'>
+                    <Button basic icon labelPosition='left' className="primary">
+                      <Icon name='cart arrow down' />
+                      My Songs
                   </Button>
-                </Link>
+                  </Link>
+                </Button.Group>
               </Card.Content>
             </Card>
             <h3>Recommended Songs</h3>

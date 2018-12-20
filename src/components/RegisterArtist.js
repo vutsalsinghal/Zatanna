@@ -12,6 +12,7 @@ class RegisterArtist extends Component {
     artistName: '',
     likedGenre: [],
     msg: '',
+    open: false,
   }
 
   onSubmit = async event => {
@@ -31,24 +32,27 @@ class RegisterArtist extends Component {
               // Send request to AWS
               let lastArtist = await ZatannaInstance.methods.lastArtist().call({ from: this.props.account });
               let userDetail = await ZatannaInstance.methods.userDetail().call({ from: this.props.account });
-              let userRequest = {
-                'action': "addUser",
-                'uID': userDetail[0],
-                'uName': this.state.artistName,
-              }
 
-              // Send request to AWS
-              awsSigning(userRequest, 'v1/rdsaction');
+              setTimeout(async () => {
+                let userRequest = {
+                  'action': "addUser",
+                  'uID': userDetail[0],
+                  'uName': this.state.artistName,
+                }
 
-              let artistRequest = {
-                'action': "addArtist",
-                'aID': lastArtist,
-                'uID': userDetail[0],
-                'aName': this.state.artistName,
-                'aAddress': this.props.account
-              }
+                // Send request to AWS
+                await awsSigning(userRequest, 'v1/rdsaction');
 
-              awsSigning(artistRequest, 'v1/rdsaction');
+                let artistRequest = {
+                  'action': "addArtist",
+                  'aID': lastArtist,
+                  'uID': userDetail[0],
+                  'aName': this.state.artistName,
+                  'aAddress': this.props.account
+                }
+
+                awsSigning(artistRequest, 'v1/rdsaction');
+              }, 1000);
             } catch (e) {
               this.setState({ errorMessage: e.message });
             }
@@ -70,7 +74,7 @@ class RegisterArtist extends Component {
 
     if (value.length >= 3) {
       value = value.slice(0, 3);
-      //this.setState({msg:"Thanks for choosing 3 genres!"});
+      this.setState({ open: false });
     }
     this.setState({ likedGenre: value });
   }
@@ -102,7 +106,7 @@ class RegisterArtist extends Component {
         <Form.Group>
           <Form.Field width={12}>
             <label>Choose 3 genres that you like:</label><br />
-            <Dropdown placeholder='Choose Genre' value={this.state.likedGenre} options={genreOptions} search multiple selection onChange={this.handleGenre} />
+            <Dropdown placeholder='Choose Genre' open={this.state.open} onClick={() => this.setState({ open: !this.state.open })} value={this.state.likedGenre} options={genreOptions} search multiple selection onChange={this.handleGenre} />
           </Form.Field>
           <Button size='small' floated='right' primary basic loading={this.state.loading} disabled={this.state.loading}>
             Register

@@ -104,7 +104,7 @@ class mySongs extends Component {
         {(this.state.role === '1' || this.state.role === '2') &&
           <div>
             <h2>List of Purchased Songs</h2>
-            {this.state.playlist.length < 0 &&
+            {this.state.playlist.length === 0 &&
               <h3>No Songs Purchased!</h3>
             }
 

@@ -44,30 +44,25 @@ class SearchSong extends Component {
   render() {
     return (
       <Grid stackable>
-        <Card fluid color='green'>
-          <Card.Content>
-            <Grid.Row>
-              <Form size={'tiny'} onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
-                <Form.Group inline>
-                  <Form.Field>
-                    <Input onChange={event => this.setState({ query: event.target.value, open: false, display: false })} />
-                  </Form.Field>
-                  <Button size='small' floated='right' primary loading={this.state.loading} disabled={this.state.loading} icon='search'>
-                  </Button>
-                  <Popup keepInViewPort context={this.state.node} content='No songs found!' position='right center' open={this.state.open} />
-                  <div ref={this.handleRef}></div>
-                </Form.Group>
-                <Message error header="Oops!" content={this.state.errorMessage} />
-              </Form>
-            </Grid.Row>
-            {this.state.display &&
-              <Grid.Row>
-                <Card.Group>{this.state.items}</Card.Group>
-              </Grid.Row>
-            }
-
-          </Card.Content>
-        </Card >
+        <Grid.Row>
+          <Form size={'tiny'} onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
+            <Form.Group inline>
+              <Form.Field>
+                <Input onChange={event => this.setState({ query: event.target.value, open: false, display: false })} />
+              </Form.Field>
+              <Button size='small' floated='right' primary loading={this.state.loading} disabled={this.state.loading} icon='search'>
+              </Button>
+              <Popup keepInViewPort context={this.state.node} content='No songs found!' position='right center' open={this.state.open} />
+              <div ref={this.handleRef}></div>
+            </Form.Group>
+            <Message error header="Oops!" content={this.state.errorMessage} />
+          </Form>
+        </Grid.Row>
+        {this.state.display &&
+          <Grid.Row>
+            <Card.Group>{this.state.items}</Card.Group>
+          </Grid.Row>
+        }
       </Grid>
     );
   }

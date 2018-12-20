@@ -104,7 +104,7 @@ class SongList extends Component {
                   <SearchSong />
                 </Modal.Description>
               </Modal.Content>
-            </Modal>
+            </Modal><br /><br /><br />
             {this.renderSongs()}
           </div>
         }

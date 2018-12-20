@@ -39,7 +39,6 @@ class UploadSong extends Component {
 
   fileCapture = (file) => {
     this.setState({ errorMessage: '', loading: true, msg: '', name: file.name });
-
     if (typeof file !== 'undefined') {
       if (file.type.split('/')[0] === 'audio') {
         try {
@@ -67,12 +66,11 @@ class UploadSong extends Component {
         }
       } else {
         this.setState({ errorMessage: 'Not a audio file!' });
-        this.setState({ loading: false });
       }
     } else {
       this.setState({ errorMessage: 'No file selected!' });
-      this.setState({ loading: false });
     }
+    this.setState({ loading: false });
   }
 
   checkUnique = async (file) => {
