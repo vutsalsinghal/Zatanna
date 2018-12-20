@@ -37,7 +37,7 @@ class mySongs extends Component {
           //{aID, sID, name, cost, releaseDate, genre}
           let artistDetail = await ZatannaInstance.methods.artistDetail(song[0]).call({ from: accounts[0] });
           let d = {
-            url: "https://s3.amazonaws.com/zatanna-music-upload/songs/" + song[2].split(' ').join('+'),
+            url: process.env.REACT_APP_bucket_link + song[2].split(' ').join('+'),
             cover: "",
             artist: {
               name: artistDetail[0],

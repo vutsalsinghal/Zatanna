@@ -28,8 +28,6 @@ class Home extends Component {
     this.setState({ loadingData: false });
   }
 
-
-
   render() {
     if (this.state.loadingData) {
       return (

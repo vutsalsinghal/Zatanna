@@ -16,3 +16,4 @@ src/config.js
 
 ./credentials
 *.sql
+*copy*

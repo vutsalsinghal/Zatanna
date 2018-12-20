@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Loader, Dimmer, Card, Grid, Button, Icon, Modal, Label, Popup } from 'semantic-ui-react';
+import axios from 'axios';
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 import Donate from './Donate';
@@ -27,11 +28,15 @@ class SongDetail extends Component {
     loading: false,
     errorMessage: '',
     msg: '',
+    ethToUSD: '',
   }
 
   async componentDidMount() {
     this.setState({ loadingData: true });
     document.title = "Zatanna | Song Detail";
+
+    let ethToUSD = await axios.get('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD');
+    this.setState({ ethToUSD: ethToUSD.data.USD });
 
     try {
       const accounts = await web3.eth.getAccounts();
@@ -93,12 +98,14 @@ class SongDetail extends Component {
       var month = "0" + (date.getMonth() + 1);
       var day = date.getDate();
       var formattedDate = day + '-' + month.substr(-2) + '-' + year;
+      var costInEth = parseFloat(web3.utils.fromWei(this.state.cost, 'ether'));
+      var costInUSD = parseFloat(costInEth * this.state.ethToUSD).toFixed(4);
 
       return (
         <Card>
           <Card.Content>
             <AudioPlayer songs={[{
-              url: "https://s3.amazonaws.com/zatanna-music-upload/songs/" + this.state.name.split(' ').join('+'),
+              url: process.env.REACT_APP_bucket_link + this.state.name.split(' ').join('+'),
               cover: "",
               artist: {
                 name: this.state.artistName,
@@ -116,7 +123,7 @@ class SongDetail extends Component {
                   </div>
                 } content='Times you can listen without purchasing!' position='bottom left' />
               }
-              <p>Cost: <span style={{ color: "#4285F4", fontWeight: "bold" }}>{web3.utils.fromWei(this.state.cost, 'ether')} ETH</span></p>
+              <p>Cost: <span style={{ color: "#4285F4", fontWeight: "bold" }}>{costInEth} ETH </span>{'= $'} <span style={{ color: "#cc0000", fontWeight: "bold" }}>{costInUSD} USD</span></p>
             </Card.Description>
           </Card.Content>
         </Card >

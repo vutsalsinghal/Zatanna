@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Loader, Dimmer, Card } from 'semantic-ui-react';
+import { Loader, Dimmer, Card, Modal, Button, Icon } from 'semantic-ui-react';
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 import SearchSong from './SearchSong';
@@ -11,7 +11,6 @@ class SongList extends Component {
     role: '',
     userAccount: '',
     loadingData: false,
-    loading: false,
     errorMessage: '',
     msg: '',
   }
@@ -97,17 +96,24 @@ class SongList extends Component {
       <div>
         {(this.state.role === '1' || this.state.role === '2') &&
           <div>
-            <h2>Discover The Expanse!</h2>
-            <SearchSong />
-
+            <h2> Discover The Expanse!</h2>
+            <Modal trigger={<Button floated='right' primary basic><Icon name='search' />Search</Button>}>
+              <Modal.Header>Search Songs</Modal.Header>
+              <Modal.Content>
+                <Modal.Description>
+                  <SearchSong />
+                </Modal.Description>
+              </Modal.Content>
+            </Modal>
             {this.renderSongs()}
           </div>
         }
 
-        {this.state.role === '0' &&
+        {
+          this.state.role === '0' &&
           <h2>You are not registered!</h2>
         }
-      </div>
+      </div >
     );
   }
 }
