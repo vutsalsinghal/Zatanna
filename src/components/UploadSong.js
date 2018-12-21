@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Loader, Dimmer, Message, Form, Input, Button, Dropdown } from 'semantic-ui-react';
 import S3Client from 'aws-s3';
+import axios from "axios";
 import SparkMD5 from 'spark-md5';
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
@@ -20,11 +21,15 @@ class UploadSong extends Component {
     loading: false,
     errorMessage: '',
     msg: '',
+    ethToUSD: '',
   }
 
   async componentDidMount() {
     this.setState({ loadingData: true });
     document.title = "Zatanna | Upload Song";
+
+    let ethToUSD = await axios.get('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD');
+    this.setState({ ethToUSD: ethToUSD.data.USD });
 
     try {
       const accounts = await web3.eth.getAccounts();
@@ -164,16 +169,12 @@ class UploadSong extends Component {
           <div>
             <h2>Upload Your Creation!</h2>
             <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
-              <Form.Field width={10}>
+              <Form.Field width={12}>
                 <label>Song file</label>
                 <Input type='file' onChange={event => this.fileCapture(event.target.files[0])} />
               </Form.Field>
               <Form.Group>
-                <Form.Field width={5}>
-                  <label>Song Genre</label>
-                  <Dropdown placeholder='Choose a Genre' options={genreOptions} search selection onChange={(k, { value }) => this.setState({ genre: value })} />
-                </Form.Field>
-                <Form.Field width={5}>
+                <Form.Field width={6}>
                   <label>Song Cost</label>
                   <Input
                     label="wei"
@@ -182,7 +183,15 @@ class UploadSong extends Component {
                     onChange={event => this.setState({ cost: event.target.value })}
                   />
                 </Form.Field>
-              </Form.Group><br />
+                <Form.Field width={3}>
+                  <label>In USD</label>
+                  <Input disabled value={'$' + web3.utils.fromWei(this.state.cost, 'ether') * this.state.ethToUSD} onChange={event => this.fileCapture(event.target.files[0])} />
+                </Form.Field>
+              </Form.Group>
+              <Form.Field width={4}>
+                <label>Song Genre</label>
+                <Dropdown placeholder='Choose a Genre' options={genreOptions} search selection onChange={(k, { value }) => this.setState({ genre: value })} />
+              </Form.Field>
               <Button primary basic loading={this.state.loading}>
                 Upload
             </Button>
