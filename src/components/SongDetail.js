@@ -29,6 +29,7 @@ class SongDetail extends Component {
     errorMessage: '',
     msg: '',
     ethToUSD: '',
+    songList: [],
   }
 
   async componentDidMount() {
@@ -79,6 +80,18 @@ class SongDetail extends Component {
             }
           }
 
+          let similarRequest = {
+            'action': "similarSong",
+            'genre': genre,
+          }
+          let similarResponse = await awsSigning(similarRequest, 'v1/rdsaction');
+          let songList = [];
+          for (var i = 0; i < similarResponse.data.length; i++) {
+            let { artistID, id, name, cost, releaseDate, genere, s3Link } = await ZatannaInstance.methods.songDetail(similarResponse.data[i]).call({ from: accounts[0] });
+            songList.push([id, name, cost, releaseDate, genere, s3Link, artistID]);
+          }
+          this.setState({ songList });
+          this.renderSimilarSongs();
         } else {
           this.setState({ errorMessage: 'Song does not exists!' });
         }
@@ -89,6 +102,20 @@ class SongDetail extends Component {
     }
 
     this.setState({ loadingData: false });
+  }
+
+  renderSimilarSongs = () => {
+    this.setState({ loadingData: true });
+    let items = this.state.songList.map((song, id) => {
+      return (
+        <Card key={id} href={'/songs/detail/' + song[0]}>
+          <Card.Content>
+            <Card.Header>{song[1].split('.').slice(0, -1).join('.')}</Card.Header>
+          </Card.Content>
+        </Card>
+      );
+    });
+    this.setState({ items, loadingData: false });
   }
 
   renderSong = () => {
@@ -151,6 +178,7 @@ class SongDetail extends Component {
               <Grid.Column width={12}>
                 {this.renderSong()}
                 <h3>Similar Songs</h3>
+                <Card.Group>{this.state.items}</Card.Group>
               </Grid.Column>
               {!this.state.errorMessage &&
                 <Grid.Column width={4}>

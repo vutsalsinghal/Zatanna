@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './components/Home';
 import UploadSong from './components/UploadSong';

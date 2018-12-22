@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Grid, Loader, Dimmer, Button, Modal, Icon, Card } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
+import { awsSigningRecommendation } from "../utils";
 import web3 from '../ethereum/web3';
 import ZatannaInstance from '../ethereum/Zatanna';
 import RegisterUser from './RegisterUser';
@@ -12,6 +13,7 @@ class Home extends Component {
     role: '',
     account: '',
     name: '',
+    recommededSongs: [],
   }
 
   async componentDidMount() {
@@ -21,12 +23,34 @@ class Home extends Component {
     try {
       const accounts = await web3.eth.getAccounts();
       const role = await ZatannaInstance.methods.getRole().call({ from: accounts[0] });
-      this.setState({ role, account: accounts[0] });
-    } catch (err) {
-      console.log(err);
-    }
+      let res = await awsSigningRecommendation();
 
+      let songList = [];
+      for (var i = 0; i < res.data.length; i++) {
+        let { artistID, id, name, cost, releaseDate, genere, s3Link } = await ZatannaInstance.methods.songDetail(res.data[i]['sID']).call({ from: accounts[0] });
+        songList.push([id, name, cost, releaseDate, genere, s3Link, artistID]);
+      }
+
+      this.setState({ role, account: accounts[0], recommededSongs: songList });
+      this.renderSongs();
+    } catch (err) {
+      console.log(err.message);
+    }
     this.setState({ loadingData: false });
+  }
+
+  renderSongs = () => {
+    this.setState({ loading: true });
+    let items = this.state.recommededSongs.map((song, id) => {
+      return (
+        <Card key={id} href={'/songs/detail/' + song[0]}>
+          <Card.Content>
+            <Card.Header>{song[1].split('.').slice(0, -1).join('.')}</Card.Header>
+          </Card.Content>
+        </Card>
+      );
+    });
+    this.setState({ items, loading: false });
   }
 
   render() {
@@ -100,7 +124,7 @@ class Home extends Component {
                     <Icon name='upload' />
                     Upload Song
                   </Button>
-                </Link><br /><br />
+                </Link><br /><br /><br />
                 <Button.Group>
                   <Link to='/songs'>
                     <Button basic icon labelPosition='right' className="primary">
@@ -115,9 +139,13 @@ class Home extends Component {
                   </Button>
                   </Link>
                 </Button.Group>
+                <br /><br />
               </Card.Content>
             </Card>
+            <br /><br />
             <h3>Recommended Songs</h3>
+            <br /><br /><br /><br />
+            <Card.Group>{this.state.items}</Card.Group>
           </Grid>
         }
 
@@ -144,9 +172,13 @@ class Home extends Component {
                   </Button>
                   </Link>
                 </Button.Group>
+                <br /><br />
               </Card.Content>
             </Card>
+            <br /><br />
             <h3>Recommended Songs</h3>
+            <br /><br /><br /><br />
+            <Card.Group>{this.state.items}</Card.Group>
           </Grid>
         }
       </div>

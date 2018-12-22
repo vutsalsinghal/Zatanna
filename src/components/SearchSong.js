@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Message, Form, Input, Button, Popup, Grid, Card } from 'semantic-ui-react';
+import { Message, Form, Input, Button, Popup, Card } from 'semantic-ui-react';
 import { awsSigningElasticSearch } from '../utils.js';
 
 class SearchSong extends Component {
@@ -43,27 +43,25 @@ class SearchSong extends Component {
 
   render() {
     return (
-      <Grid stackable>
-        <Grid.Row>
-          <Form size={'tiny'} onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
-            <Form.Group inline>
-              <Form.Field>
-                <Input onChange={event => this.setState({ query: event.target.value, open: false, display: false })} />
-              </Form.Field>
-              <Button size='small' floated='right' primary loading={this.state.loading} disabled={this.state.loading} icon='search'>
-              </Button>
-              <Popup keepInViewPort context={this.state.node} content='No songs found!' position='right center' open={this.state.open} />
-              <div ref={this.handleRef}></div>
-            </Form.Group>
-            <Message error header="Oops!" content={this.state.errorMessage} />
-          </Form>
-        </Grid.Row>
+      <div>
+
+        <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
+          <Form.Group inline>
+            <Form.Field width={10}>
+              <Input onChange={event => this.setState({ query: event.target.value, open: false, display: false })} />
+            </Form.Field>
+            <Button size='small' floated='right' primary loading={this.state.loading} disabled={this.state.loading} icon='search'>
+            </Button>
+            <Popup keepInViewPort context={this.state.node} content='No songs found!' position='right center' open={this.state.open} />
+            <div ref={this.handleRef}></div>
+          </Form.Group>
+          <Message error header="Oops!" content={this.state.errorMessage} />
+        </Form>
+
         {this.state.display &&
-          <Grid.Row>
-            <Card.Group>{this.state.items}</Card.Group>
-          </Grid.Row>
+          <Card.Group>{this.state.items}</Card.Group>
         }
-      </Grid>
+      </div>
     );
   }
 }
