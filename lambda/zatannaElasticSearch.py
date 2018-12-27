@@ -13,7 +13,7 @@ credentials = boto3.Session().get_credentials()
 awsauth = AWS4Auth(credentials.access_key, credentials.secret_key,
                    region, service, session_token=credentials.token)
 
-host = '<SECRET>'
+host = '<end-point>'
 index = 'song'
 doc_type = 'lambda-type'
 url = host + '/' + index + '/' + doc_type
