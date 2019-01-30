@@ -2,7 +2,10 @@
 
 Decentralized Music Service
 
-- ![WIP!](https://placehold.it/15/f03c15/000000?text=+) Work in progress!
+- Developed a dapp on Ethereum blockchain that connects music artists directly with the end user.
+- Implemented a approach to handle de-duplication of songs and prevent song download (DRM
+compliance)
+- Built a recommender system using AWS Sagemaker to help discover new songs.
 
 ## Installation
 ```
